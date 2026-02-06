@@ -1,31 +1,60 @@
 (function () {
     const button = document.getElementById("lang-switch");
-    if (!button) return;
+    if (!button) {
+        console.error("Language switch button not found!");
+        return;
+    }
   
-    const path = window.location.pathname;
-    const parts = path.split("/").filter(Boolean);
+    const fullPath = window.location.pathname;
+    const parts = fullPath.split("/").filter(Boolean);
+    
+    console.log("Current pathname:", fullPath);
+    console.log("Path parts:", parts);
   
-    // Detect repo name (GitHub Pages project site)
-    const repoOffset =
-      parts.length && !["en", "fr"].includes(parts[0]) ? 1 : 0;
-  
-    const currentLang = parts[repoOffset];
-    if (!["en", "fr"].includes(currentLang)) return;
-  
-    const rest = "/" + parts.slice(repoOffset + 1).join("/");
+    // Detect current language from URL
+    let currentLang = "en"; // default
+    let langIndex = -1;
+    
+    // Find which part of the path contains the language
+    for (let i = 0; i < parts.length; i++) {
+        if (parts[i] === "en" || parts[i] === "fr") {
+            currentLang = parts[i];
+            langIndex = i;
+            break;
+        }
+    }
+    
+    console.log("Detected language:", currentLang);
+    console.log("Language index:", langIndex);
+    
+    // Determine target language
     const targetLang = currentLang === "en" ? "fr" : "en";
+    
+    // Build new path
+    let newPath;
+    if (langIndex === -1) {
+        // No language in path, add it
+        newPath = "/" + targetLang + "/" + parts.join("/");
+    } else {
+        // Replace current language with target language
+        const newParts = [...parts];
+        newParts[langIndex] = targetLang;
+        newPath = "/" + newParts.join("/");
+    }
+    
+    // Ensure path ends with / or .html
+    if (!newPath.endsWith("/") && !newPath.includes(".html")) {
+        newPath += "/";
+    }
+    
+    console.log("Target path:", newPath);
   
-    const targetPath =
-      "/" +
-      (repoOffset ? parts[0] + "/" : "") +
-      targetLang +
-      (rest === "/" ? "/" : rest);
+    // Update button text to show target language
+    button.textContent = targetLang.toUpperCase();
   
-    // Update button label
-    button.textContent = targetLang === "fr" ? "Français" : "English";
-  
+    // Navigate on click
     button.addEventListener("click", function () {
-      window.location.pathname = targetPath;
+        console.log("Navigating to:", newPath);
+        window.location.href = newPath;
     });
-  })();
-  
+})();
