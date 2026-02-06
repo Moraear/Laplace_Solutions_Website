@@ -520,7 +520,7 @@
                 <p>Like what you have seen? Let's get started.</p>
                 
                 <div class="contact-form">
-                    <form>
+                    <form action="https://formspree.io/f/xgolevlg" method="POST">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" id="name" name="name" placeholder="Your name" required>
@@ -608,14 +608,6 @@
 
         sections.forEach(section => {
             observer.observe(section);
-        });
-
-        /**
-         * FORM SUBMISSION
-         */
-        document.querySelector('form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Thank you for your message! We\'ll get back to you soon.');
         });
     </script>
     
