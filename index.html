@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laplace Solutions</title>
     <style>
-        /* ===================================
-           GLOBAL RESET & BASE STYLES
-           =================================== */
+        /* ==========================================================================
+           1. CORE RESET & BASE STYLES
+           ========================================================================== */
         * {
             margin: 0;
             padding: 0;
@@ -15,37 +15,35 @@
         }
 
         html {
-            scroll-behavior: smooth;  /* Smooth scrolling enabled */
+            scroll-behavior: smooth;
         }
 
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             overflow-x: hidden;
-            overflow-y: scroll;  /* Scrollbar on body, above everything */
+            overflow-y: scroll;
             background: #ffffff;
             color: #1a1a1a;
             line-height: 1.6;
-            position: relative;  /* Establish positioning context */
-            height: 100vh;  /* Full viewport height */
+            position: relative;
+            height: 100vh;
         }
 
-        /* ===================================
-           BACKGROUND VIDEO OVERLAY SYSTEM
-           =================================== */
-        /* Global background overlay - sits behind entire page */
+        /* ==========================================================================
+           2. BACKGROUND SYSTEM (Video & Overlays)
+           ========================================================================== */
         #global-bg-overlay {
-            position: fixed;  /* Fixed to viewport, not scrollable content */
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 0;  /* Behind everything */
-            opacity: 1;  /* Adjust this (0-1) to control video visibility */
+            z-index: 0;
+            opacity: 1;
             pointer-events: none;
             overflow: hidden;
         }
 
-        /* Container for background video/images - sits behind content */
         .bg-overlay {
             position: absolute;
             top: 0;
@@ -53,12 +51,11 @@
             right: 0;
             bottom: 0;
             z-index: 1;
-            opacity: 1;  /* Adjust this (0-1) to control video visibility */
+            opacity: 1;
             pointer-events: none;
             overflow: hidden;
         }
 
-        /* Ensures video/images fill the container */
         .bg-overlay img,
         .bg-overlay video,
         .bg-overlay .tenor-gif-embed {
@@ -67,7 +64,7 @@
             object-fit: cover;
         }
 
-        /* White overlay to fade the background - currently disabled (all values set to 0) */
+        /* Gradient overlay for background depth/fade */
         .bg-overlay::after {
             content: '';
             position: absolute;
@@ -75,7 +72,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            /* Adjust rgba values (0-1) to add white fade over video */
             background: linear-gradient(to bottom, 
                 rgba(255, 255, 255, 0) 0%, 
                 rgba(255, 255, 255, 0) 50%, 
@@ -83,42 +79,38 @@
             z-index: 2;
         }
 
-        /* ===================================
-           HEADER & NAVIGATION
-           =================================== */
-        /* Fixed header at top - transparent to show video */
+        /* ==========================================================================
+           3. NAVIGATION & HEADER
+           ========================================================================== */
         header {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            height: 10vh;  /* 10% of viewport height */
-            background: rgba(255, 255, 255, 0);  /* Start transparent - dynamically updated by JS */
-            backdrop-filter: blur(10px);  /* Subtle blur effect */
-            box-shadow: none;
-            z-index: 100;  /* Above global background (z-index: 0) but below content */
+            height: 10vh;
+            background: rgba(255, 255, 255, 0); 
+            backdrop-filter: blur(10px);
+            z-index: 100;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 0 4rem;
-            transition: background-color 0.3s ease;  /* Smooth transition for opacity changes */
+            transition: background-color 0.3s ease;
         }
 
-        /* Navigation container */
         nav {
             display: flex;
-            gap: 3rem;  /* Space between navigation items */
+            gap: 3rem;
             align-items: center;
         }
 
-        /* Individual navigation widgets/buttons */
         .nav-widget {
             position: relative;
             padding: 0.5rem 0;
             font-size: 0.95rem;
             font-weight: 500;
             letter-spacing: 0.3px;
-            color: #666666;  /* Default text color */
+            color: #666666;
             cursor: pointer;
             transition: all 0.3s ease;
             background: transparent;
@@ -126,18 +118,16 @@
             text-transform: uppercase;
         }
 
-        /* Navigation hover state */
-        .nav-widget:hover {
-            color: #1a1a1a;  /* Darker on hover */
-        }
-
-        /* Active navigation widget styling */
+        .nav-widget:hover,
         .nav-widget.active {
             color: #1a1a1a;
+        }
+
+        .nav-widget.active {
             font-weight: 600;
         }
 
-        /* Blue underline for active navigation item */
+        /* Underline indicator for active navigation item */
         .nav-widget.active::after {
             content: '';
             position: absolute;
@@ -145,63 +135,42 @@
             left: 0;
             right: 0;
             height: 2px;
-            background: #0066cc;  /* Brand blue color */
+            background: #0066cc;
         }
 
-        /* ===================================
-           MAIN CONTENT AREA
-           =================================== */
-        /* Main content container - no scrolling (body handles it) */
+        /* ==========================================================================
+           4. MAIN CONTENT LAYOUT
+           ========================================================================== */
         main {
-            margin-top: 0;  /* No margin - scrollbar extends to top */
-            position: relative;  /* Establish positioning context */
-            z-index: 1;  /* Above global background */
+            margin-top: 0;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Individual sections - each takes at least full viewport height */
         section {
-            min-height: 100vh;  /* Full viewport height */
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 5rem 4rem;
             position: relative;
-            /* scroll-snap-align removed for gradual scrolling */
         }
 
-        /* ===================================
-           SECTION BACKGROUNDS
-           =================================== */
-        /* About section - transparent to show global video background */
-        #about {
-            background: transparent;
-        }
+        /* Section Background logic */
+        #about { background: transparent; }
+        #expertise { background: #f8f9fa; }
+        #contact { background: #ffffff; }
 
-        /* Expertise section - light gray background */
-        #expertise {
-            background: #f8f9fa;
-        }
-
-        /* Contact section - white background */
-        #contact {
-            background: #ffffff;
-        }
-
-        /* ===================================
-           SECTION CONTENT CONTAINER
-           =================================== */
-        /* Content wrapper - ensures content appears above background */
         .section-content {
             max-width: 1200px;
             width: 100%;
-            opacity: 0;  /* Starts invisible */
-            transform: translateY(30px);  /* Starts shifted down */
-            animation: fadeInUp 0.8s ease forwards;  /* Fade in animation */
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
             position: relative;
-            z-index: 10;  /* Appears above background overlay */
+            z-index: 10;
         }
 
-        /* Fade in animation for content */
         @keyframes fadeInUp {
             to {
                 opacity: 1;
@@ -209,25 +178,22 @@
             }
         }
 
-        /* ===================================
-           TYPOGRAPHY
-           =================================== */
-        /* Main heading (h1) */
+        /* ==========================================================================
+           5. TYPOGRAPHY
+           ========================================================================== */
         h1 {
             font-size: 3.5rem;
-            font-weight: 300;  /* Light weight */
+            font-weight: 300;
             margin-bottom: 2rem;
             color: #1a1a1a;
             line-height: 1.2;
             letter-spacing: -0.5px;
         }
 
-        /* Bold text within h1 */
         h1 strong {
             font-weight: 600;
         }
 
-        /* Section headings (h2) */
         h2 {
             font-size: 2rem;
             margin-bottom: 1.5rem;
@@ -235,7 +201,6 @@
             font-weight: 600;
         }
 
-        /* Paragraph text */
         p {
             font-size: 1.1rem;
             line-height: 1.8;
@@ -244,7 +209,6 @@
             max-width: 800px;
         }
 
-        /* Subtitle text (larger paragraph) */
         .subtitle {
             font-size: 1.25rem;
             color: #444444;
@@ -252,18 +216,19 @@
             font-weight: 400;
         }
 
-        /* ===================================
-           EXPERTISE SECTION - CARD GRID
-           =================================== */
-        /* Grid container for expertise cards */
+        /* ==========================================================================
+           6. COMPONENTS (Expertise Grid, Buttons, Forms)
+           ========================================================================== */
+        
+        /* Grid Layout */
         .expertise-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3rem;  /* Space between cards */
+            gap: 3rem;
             margin-top: 4rem;
         }
 
-        /* Individual expertise card */
+        /* Cards */
         .expertise-card {
             background: #ffffff;
             border-radius: 8px;
@@ -272,18 +237,16 @@
             border: 1px solid #e5e5e5;
         }
 
-        /* Card hover effect */
         .expertise-card:hover {
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            transform: translateY(-5px);  /* Lift up on hover */
+            transform: translateY(-5px);
             border-color: #d0d0d0;
         }
 
-        /* Icon container within card */
         .expertise-card .icon {
             width: 60px;
             height: 60px;
-            background: #0066cc;  /* Brand blue */
+            background: #0066cc;
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -292,7 +255,6 @@
             font-size: 1.8rem;
         }
 
-        /* Card heading */
         .expertise-card h3 {
             font-size: 1.35rem;
             margin-bottom: 1rem;
@@ -300,28 +262,22 @@
             font-weight: 600;
         }
 
-        /* Card description text */
         .expertise-card p {
             font-size: 0.95rem;
             color: #666666;
             line-height: 1.7;
         }
 
-        /* ===================================
-           CONTACT FORM
-           =================================== */
-        /* Form container */
+        /* Form Controls */
         .contact-form {
             max-width: 600px;
             margin-top: 3rem;
         }
 
-        /* Form field group */
         .form-group {
             margin-bottom: 2rem;
         }
 
-        /* Form labels */
         label {
             display: block;
             margin-bottom: 0.7rem;
@@ -332,7 +288,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Text inputs and textarea */
         input, textarea {
             width: 100%;
             padding: 1rem;
@@ -345,151 +300,78 @@
             transition: all 0.3s ease;
         }
 
-        /* Input focus state */
         input:focus, textarea:focus {
             outline: none;
-            border-color: #0066cc;  /* Brand blue on focus */
+            border-color: #0066cc;
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
 
-        /* Textarea specific styling */
         textarea {
-            resize: vertical;  /* Allow vertical resize only */
+            resize: vertical;
             min-height: 150px;
         }
 
-        /* Submit button */
-        button {
+        /* Buttons */
+        button, .btn-primary, .btn-secondary {
             padding: 1rem 2.5rem;
-            background: #0066cc;  /* Brand blue */
-            border: none;
             border-radius: 4px;
-            color: #ffffff;
             font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-        }
-
-        /* Button hover effect */
-        button:hover {
-            background: #0052a3;  /* Darker blue on hover */
-            transform: translateY(-2px);  /* Lift up slightly */
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
-        }
-
-        /* ===================================
-           CALL-TO-ACTION BUTTONS
-           =================================== */
-        /* CTA button container */
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        /* Primary CTA button (filled) */
-        .btn-primary {
-            padding: 1rem 2.5rem;
-            background: #0066cc;  /* Brand blue */
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
             display: inline-block;
+            text-decoration: none;
         }
 
-        /* Primary button hover effect */
-        .btn-primary:hover {
-            background: #0052a3;  /* Darker blue */
+        button, .btn-primary {
+            background: #0066cc;
+            color: #ffffff;
+            border: none;
+        }
+
+        button:hover, .btn-primary:hover {
+            background: #0052a3;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
         }
 
-        /* Secondary CTA button (outlined) */
         .btn-secondary {
-            padding: 1rem 2.5rem;
             background: transparent;
-            color: #0066cc;  /* Brand blue text */
-            text-decoration: none;
-            border-radius: 4px;
-            border: 2px solid #0066cc;  /* Brand blue border */
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-block;
+            color: #0066cc;
+            border: 2px solid #0066cc;
         }
 
-        /* Secondary button hover effect - fills with color */
         .btn-secondary:hover {
             background: #0066cc;
             color: #ffffff;
             transform: translateY(-2px);
         }
 
-        /* ===================================
-           RESPONSIVE DESIGN - MOBILE
-           =================================== */
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        /* ==========================================================================
+           7. RESPONSIVE DESIGN
+           ========================================================================== */
         @media (max-width: 768px) {
-            /* Reduce header padding on mobile */
-            header {
-                padding: 0 1.5rem;
-            }
-
-            /* Reduce nav spacing on mobile */
-            nav {
-                gap: 1.5rem;
-            }
-
-            /* Smaller nav text on mobile */
-            .nav-widget {
-                font-size: 0.85rem;
-            }
-
-            /* Smaller heading on mobile */
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            /* Smaller h2 on mobile */
-            h2 {
-                font-size: 1.75rem;
-            }
-
-            /* Smaller paragraph text on mobile */
-            p, .subtitle {
-                font-size: 1rem;
-            }
-
-            /* Reduce section padding on mobile */
-            section {
-                padding: 3rem 1.5rem;
-            }
-
-            /* Reduce gap between cards on mobile */
-            .expertise-grid {
-                gap: 2rem;
-            }
-
-            /* Stack CTA buttons vertically on mobile */
-            .cta-buttons {
-                flex-direction: column;
-            }
+            header { padding: 0 1.5rem; }
+            nav { gap: 1.5rem; }
+            .nav-widget { font-size: 0.85rem; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.75rem; }
+            p, .subtitle { font-size: 1rem; }
+            section { padding: 3rem 1.5rem; }
+            .expertise-grid { gap: 2rem; }
+            .cta-buttons { flex-direction: column; }
         }
     </style>
 </head>
 <body>
-    <!-- ===================================
-         BACKGROUND VIDEO - Behind everything
-         =================================== -->
     <div class="bg-overlay" id="global-bg-overlay">
         <video autoplay loop muted playsinline id="about-bg-video">
             <source id="about-video-source" type="video/mp4">
@@ -497,38 +379,20 @@
         </video>
     </div>
 
-    <!-- ===================================
-         FIXED HEADER WITH NAVIGATION
-         =================================== -->
     <header>
         <nav>
-            <!-- Navigation widgets - click to scroll to section -->
             <div class="nav-widget active" data-target="about">ABOUT US</div>
             <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
             <div class="nav-widget" data-target="contact">CONTACT US</div>
         </nav>
     </header>
 
-    <!-- ===================================
-         MAIN SCROLLABLE CONTENT AREA
-         =================================== -->
     <main id="main-content">
         
-        <!-- ===================================
-             SECTION 1: ABOUT US
-             - Background: Video overlay (Sample_4.mp4) - now global
-             - White text for visibility
-             =================================== -->
         <section id="about">
-            <!-- Section content - appears above video -->
             <div class="section-content">
-                <!-- Main heading - white text for video background -->
                 <h1 style="color: #ffffff;">Transforming the future of <strong>finance and accounting</strong></h1>
-                
-                <!-- Subtitle - white text for video background -->
                 <p class="subtitle" style="color: #ffffff;">As your trusted financial technology partner, we bridge the gap between finance and technology, delivering compliance-driven and optimization-focused solutions tailored for the modern enterprise.</p>
-                
-                <!-- Call-to-action buttons -->
                 <div class="cta-buttons">
                     <a href="#expertise" class="btn-primary">Learn More</a>
                     <a href="#contact" class="btn-secondary">Schedule a Consultation</a>
@@ -536,54 +400,42 @@
             </div>
         </section>
 
-        <!-- ===================================
-             SECTION 2: OUR EXPERTISE
-             - Background: Light gray (#f8f9fa)
-             - Grid of service cards
-             =================================== -->
         <section id="expertise">
             <div class="section-content">
                 <h2>What we do</h2>
                 <p>We strive to be your financial technology partner of preference, going the extra mile, above and beyond, and out of our way to ensure your organization receives best-in-class service and expertise.</p>
                 
-                <!-- Grid of expertise cards -->
                 <div class="expertise-grid">
-                    <!-- Card 1: Corporate Finance -->
                     <div class="expertise-card">
                         <div class="icon">💼</div>
                         <h3>Corporate Finance Optimization</h3>
                         <p>Streamlining financial processes and implementing advanced analytics to drive operational efficiency and strategic decision-making.</p>
                     </div>
                     
-                    <!-- Card 2: Digital Transformation -->
                     <div class="expertise-card">
                         <div class="icon">🔄</div>
                         <h3>Finance Digital Transformation</h3>
                         <p>Modernizing legacy financial systems with cutting-edge technology solutions that enhance accuracy, speed, and compliance.</p>
                     </div>
                     
-                    <!-- Card 3: Actuarial Solutions -->
                     <div class="expertise-card">
                         <div class="icon">📊</div>
                         <h3>Actuarial Solutions</h3>
                         <p>Delivering sophisticated actuarial modeling and risk assessment tools powered by advanced analytics and machine learning.</p>
                     </div>
                     
-                    <!-- Card 4: Regulatory & Risk -->
                     <div class="expertise-card">
                         <div class="icon">⚖️</div>
                         <h3>Regulatory & Risk Advisory</h3>
                         <p>Navigating complex regulatory landscapes with expert guidance on compliance frameworks including IFRS, GAAP, and ESG reporting standards.</p>
                     </div>
                     
-                    <!-- Card 5: ESG -->
                     <div class="expertise-card">
                         <div class="icon">🌱</div>
                         <h3>ESG Transformation</h3>
                         <p>Implementing comprehensive Environmental, Social, and Governance frameworks aligned with ISSB and CSRD requirements.</p>
                     </div>
                     
-                    <!-- Card 6: Strategic Consulting -->
                     <div class="expertise-card">
                         <div class="icon">🎯</div>
                         <h3>Strategic Consulting</h3>
@@ -593,38 +445,28 @@
             </div>
         </section>
 
-        <!-- ===================================
-             SECTION 3: CONTACT US
-             - Background: White (#ffffff)
-             - Contact form
-             =================================== -->
         <section id="contact">
             <div class="section-content">
                 <h2>Let's change the game together</h2>
                 <p>Like what you have seen? Let's get started.</p>
                 
-                <!-- Contact form -->
                 <div class="contact-form">
                     <form>
-                        <!-- Name field -->
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" id="name" name="name" placeholder="Your name" required>
                         </div>
                         
-                        <!-- Email field -->
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
                         </div>
                         
-                        <!-- Message field -->
                         <div class="form-group">
                             <label for="message">Message</label>
                             <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
                         </div>
                         
-                        <!-- Submit button -->
                         <button type="submit">Send Message</button>
                     </form>
                 </div>
@@ -632,55 +474,43 @@
         </section>
     </main>
 
-    <!-- ===================================
-         JAVASCRIPT - FUNCTIONALITY
-         =================================== -->
     <script>
-        /* ===================================
-           VIDEO CONFIGURATION
-           =================================== */
-        // Video filename - change this to use a different video
+        /**
+         * VIDEO CONFIGURATION
+         * Logic to resolve local paths for the background video.
+         */
         const mp4_file_name_1 = 'Sample_4.mp4';
-        
-        // Automatically construct path to Media folder
         const currentPath = window.location.pathname;
         const currentDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
         const mp4_folder_path_1 = currentDir + '/Media';
         
-        // Set the video source dynamically
         const videoSource = document.getElementById('about-video-source');
         if (videoSource) {
             videoSource.src = `${mp4_folder_path_1}/${mp4_file_name_1}`;
         }
         
-        /* ===================================
-           NAVIGATION FUNCTIONALITY
-           =================================== */
-        // Get all navigation widgets and sections
+        /**
+         * NAVIGATION & SCROLLING
+         */
         const navWidgets = document.querySelectorAll('.nav-widget');
         const sections = document.querySelectorAll('section');
         const header = document.querySelector('header');
 
-        // Handle navigation clicks - smooth scroll to section
+        // Smooth scroll implementation
         navWidgets.forEach(widget => {
             widget.addEventListener('click', () => {
                 const targetId = widget.getAttribute('data-target');
                 const targetSection = document.getElementById(targetId);
-                
-                // Smooth scroll to the target section
                 targetSection.scrollIntoView({ behavior: 'smooth' });
             });
         });
 
-        /* ===================================
-           DYNAMIC HEADER OPACITY ON SCROLL
-           =================================== */
-        // Update header background opacity based on scroll position
+        /**
+         * DYNAMIC HEADER STYLING
+         * Toggles header background based on scroll depth.
+         */
         window.addEventListener('scroll', () => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            
-            // If at the top (scrollTop is 0), make header transparent
-            // Otherwise, make it opaque (white with opacity 0.98)
             if (scrollTop === 0) {
                 header.style.backgroundColor = 'rgba(255, 255, 255, 0)';
             } else {
@@ -688,50 +518,39 @@
             }
         });
 
-        /* ===================================
-           ACTIVE SECTION TRACKING
-           =================================== */
-        // Options for intersection observer
+        /**
+         * ACTIVE SECTION TRACKING
+         * Updates navigation UI based on the section currently in the viewport.
+         */
         const observerOptions = {
-            root: null,  // Observe within viewport (null = window)
-            threshold: 0.5  // Trigger when 50% of section is visible
+            root: null,
+            threshold: 0.5 
         };
 
-        // Observer to track which section is currently visible
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const targetId = entry.target.id;
-                    
-                    // Update active state on navigation widgets
                     navWidgets.forEach(widget => {
-                        widget.classList.remove('active');
-                        if (widget.getAttribute('data-target') === targetId) {
-                            widget.classList.add('active');
-                        }
+                        widget.classList.toggle('active', widget.getAttribute('data-target') === targetId);
                     });
                 }
             });
         }, observerOptions);
 
-        // Observe all sections
         sections.forEach(section => {
             observer.observe(section);
         });
 
-        /* ===================================
-           FORM SUBMISSION HANDLER
-           =================================== */
-        // Prevent default form submission (for demo purposes)
+        /**
+         * FORM SUBMISSION
+         */
         document.querySelector('form').addEventListener('submit', (e) => {
             e.preventDefault();
-            // Show confirmation message
             alert('Thank you for your message! We\'ll get back to you soon.');
-            // In production, replace this with actual form submission logic
         });
     </script>
     
-    <!-- Tenor GIF Embed Script (kept for compatibility if needed) -->
     <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
 </body>
 </html>
