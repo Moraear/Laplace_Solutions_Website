@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Landing Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow-x: hidden;
+            background: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+
+        /* Background Overlay System */
+        .bg-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1;
+            opacity: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bg-overlay img,
+        .bg-overlay video,
+        .bg-overlay .tenor-gif-embed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* White overlay to fade the background */
+        .bg-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0) 50%, 
+                rgba(255, 255, 255, 0) 100%);
+            z-index: 2;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 10vh;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4rem;
+        }
+
+        nav {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-widget {
+            position: relative;
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            color: #666666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: transparent;
+            border: none;
+            text-transform: uppercase;
+        }
+
+        .nav-widget:hover {
+            color: #1a1a1a;
+        }
+
+        .nav-widget.active {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .nav-widget.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0066cc;
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 10vh;
+            height: 90vh;
+            overflow-y: scroll;
+            scroll-behavior: smooth;
+        }
+
+        section {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem 4rem;
+            position: relative;
+        }
+
+        /* Section Backgrounds */
+        #about {
+            background: #ffffff;
+        }
+
+        #expertise {
+            background: #f8f9fa;
+        }
+
+        #contact {
+            background: #ffffff;
+        }
+
+        .section-content {
+            max-width: 1200px;
+            width: 100%;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 300;
+            margin-bottom: 2rem;
+            color: #1a1a1a;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+        }
+
+        h1 strong {
+            font-weight: 600;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #666666;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #444444;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+
+        /* Expertise Grid */
+        .expertise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .expertise-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e5e5;
+        }
+
+        .expertise-card:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            transform: translateY(-5px);
+            border-color: #d0d0d0;
+        }
+
+        .expertise-card .icon {
+            width: 60px;
+            height: 60px;
+            background: #0066cc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .expertise-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .expertise-card p {
+            font-size: 0.95rem;
+            color: #666666;
+            line-height: 1.7;
+        }
+
+        /* Contact Form */
+        .contact-form {
+            max-width: 600px;
+            margin-top: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 1rem;
+            background: #ffffff;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            color: #1a1a1a;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        button {
+            padding: 1rem 2.5rem;
+            background: #0066cc;
+            border: none;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+        /* CTA Buttons */
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: #0066cc;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background: #0052a3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: #0066cc;
+            text-decoration: none;
+            border-radius: 4px;
+            border: 2px solid #0066cc;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background: #0066cc;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 1.5rem;
+            }
+
+            nav {
+                gap: 1.5rem;
+            }
+
+            .nav-widget {
+                font-size: 0.85rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            h2 {
+                font-size: 1.75rem;
+            }
+
+            p, .subtitle {
+                font-size: 1rem;
+            }
+
+            section {
+                padding: 3rem 1.5rem;
+            }
+
+            .expertise-grid {
+                gap: 2rem;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header with Navigation Widgets -->
+    <header>
+        <nav>
+            <div class="nav-widget active" data-target="about">ABOUT US</div>
+            <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
+            <div class="nav-widget" data-target="contact">CONTACT US</div>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+        <!-- About Us Section -->
+        <section id="about">
+            <div class="bg-overlay">
+                <video autoplay loop muted playsinline id="about-bg-video">
+                    <source id="about-video-source" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+            <div class="section-content">
+                <h1 style="color: #ffffff;">Transforming the future of <strong>finance and accounting</strong></h1>
+                <p class="subtitle" style="color: #ffffff;">As your trusted financial technology partner, we bridge the gap between finance and technology, delivering compliance-driven and optimization-focused solutions tailored for the modern enterprise.</p>
+                <div class="cta-buttons">
+                    <a href="#expertise" class="btn-primary">Learn More</a>
+                    <a href="#contact" class="btn-secondary">Schedule a Consultation</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Expertise Section -->
+        <section id="expertise">
+            <div class="section-content">
+                <h2>What we do</h2>
+                <p>We strive to be your financial technology partner of preference, going the extra mile to ensure your organization receives best-in-class service and expertise.</p>
+                
+                <div class="expertise-grid">
+                    <div class="expertise-card">
+                        <div class="icon">💼</div>
+                        <h3>Corporate Finance Optimization</h3>
+                        <p>Streamlining financial processes and implementing advanced analytics to drive operational efficiency and strategic decision-making.</p>
+                    </div>
+                    <div class="expertise-card">
+                        <div class="icon">🔄</div>
+                        <h3>Finance Digital Transformation</h3>
+                        <p>Modernizing legacy financial systems with cutting-edge technology solutions that enhance accuracy, speed, and compliance.</p>
+                    </div>
+                    <div class="expertise-card">
+                        <div class="icon">📊</div>
+                        <h3>Actuarial Solutions</h3>
+                        <p>Delivering sophisticated actuarial modeling and risk assessment tools powered by advanced analytics and machine learning.</p>
+                    </div>
+                    <div class="expertise-card">
+                        <div class="icon">⚖️</div>
+                        <h3>Regulatory & Risk Advisory</h3>
+                        <p>Navigating complex regulatory landscapes with expert guidance on compliance frameworks including IFRS, GAAP, and ESG reporting standards.</p>
+                    </div>
+                    <div class="expertise-card">
+                        <div class="icon">🌱</div>
+                        <h3>ESG Transformation</h3>
+                        <p>Implementing comprehensive Environmental, Social, and Governance frameworks aligned with ISSB and CSRD requirements.</p>
+                    </div>
+                    <div class="expertise-card">
+                        <div class="icon">🎯</div>
+                        <h3>Strategic Consulting</h3>
+                        <p>Providing strategic guidance to help finance organizations navigate transformation initiatives and achieve measurable business outcomes.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Us Section -->
+        <section id="contact">
+            <div class="section-content">
+                <h2>Let's change the game together</h2>
+                <p>Like what you have seen? Let's get started.</p>
+                
+                <div class="contact-form">
+                    <form>
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
+                        </div>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Video configuration - Dynamically uses Media folder in same directory as HTML file
+        const mp4_file_name_1 = 'Sample_4.mp4';          // Video filename
+        
+        // Get the current script's directory and construct path to Media folder
+        const currentPath = window.location.pathname;
+        const currentDir = currentPath.substring(0, currentPath.lastIndexOf('/'));
+        const mp4_folder_path_1 = currentDir + '/Media';
+        
+        // Set video source
+        const videoSource = document.getElementById('about-video-source');
+        if (videoSource) {
+            videoSource.src = `${mp4_folder_path_1}/${mp4_file_name_1}`;
+        }
+        
+        // Navigation functionality
+        const navWidgets = document.querySelectorAll('.nav-widget');
+        const sections = document.querySelectorAll('section');
+        const mainContent = document.getElementById('main-content');
+
+        // Handle navigation clicks
+        navWidgets.forEach(widget => {
+            widget.addEventListener('click', () => {
+                const targetId = widget.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Update active navigation on scroll
+        const observerOptions = {
+            root: mainContent,
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const targetId = entry.target.id;
+                    
+                    navWidgets.forEach(widget => {
+                        widget.classList.remove('active');
+                        if (widget.getAttribute('data-target') === targetId) {
+                            widget.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Form submission (prevent default for demo)
+        document.querySelector('form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you soon.');
+        });
+    </script>
+    
+    <!-- Tenor GIF Embed Script -->
+    <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+</body>
+</html>
