@@ -22,7 +22,7 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             overflow-x: hidden;
             overflow-y: scroll;
-            background: #ffffff;
+            background:rgb(0, 40, 80);
             color: #1a1a1a;
             line-height: 1.6;
             position: relative;
@@ -39,7 +39,7 @@
             right: 0;
             bottom: 0;
             z-index: 0;
-            opacity: 1;
+            opacity: 0.6;
             pointer-events: none;
             overflow: hidden;
         }
@@ -100,6 +100,20 @@
 
         .header-left {
             flex: 0 0 15%;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-left img {
+            max-height: 60px;
+            width: auto;
+            object-fit: contain;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+        }
+
+        .header-left img:hover {
+            opacity: 0.8;
         }
 
         .header-middle {
@@ -127,7 +141,7 @@
             font-size: 0.95rem;
             font-weight: 500;
             letter-spacing: 0.3px;
-            color: #666666;
+            color: #ffffff;
             cursor: pointer;
             transition: all 0.3s ease;
             background: transparent;
@@ -137,7 +151,19 @@
 
         .nav-widget:hover,
         .nav-widget.active {
-            color: #1a1a1a;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* Scrolled state - gray text */
+        .nav-widget.scrolled {
+            color: #666666;
+        }
+        
+        .nav-widget.scrolled:hover,
+        .nav-widget.scrolled.active {
+            color: #0066cc;
+            transform: translateY(-1px);
         }
 
         .nav-widget.active {
@@ -161,9 +187,9 @@
             font-size: 0.85rem;
             font-weight: 600;
             letter-spacing: 0.5px;
-            color: #666666;
+            color: #ffffff;
             background: transparent;
-            border: 2px solid #666666;
+            border: 2px solid #ffffff;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -171,6 +197,18 @@
         }
 
         #lang-switch:hover {
+            color: #ffffff;
+            border-color: #ffffff;
+            transform: translateY(-1px);
+        }
+        
+        /* Scrolled state - gray text and border */
+        #lang-switch.scrolled {
+            color: #666666;
+            border-color: #666666;
+        }
+        
+        #lang-switch.scrolled:hover {
             color: #0066cc;
             border-color: #0066cc;
             transform: translateY(-1px);
@@ -195,8 +233,9 @@
         }
 
         /* Section Background logic */
-        #about { background: transparent; }
-        #expertise { background: #f8f9fa; }
+        #home { background: transparent; }
+        #expertise { background: #ffffff; }
+        #about { background: #f8f9fa; }
         #contact { background: #ffffff; }
 
         .section-content {
@@ -244,7 +283,7 @@
             line-height: 1.8;
             color: #666666;
             margin-bottom: 1.5rem;
-            max-width: 800px;
+            max-width: 850px;
         }
 
         .subtitle {
@@ -281,6 +320,24 @@
             border-color: #d0d0d0;
         }
 
+        .expertise-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .expertise-header-left {
+            flex: 0 0 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .expertise-header-right {
+            flex: 0 0 80%;
+            padding-left: 1rem;
+        }
+
         .expertise-card .icon {
             width: 60px;
             height: 60px;
@@ -289,13 +346,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
             font-size: 1.8rem;
         }
 
         .expertise-card h3 {
             font-size: 1.35rem;
-            margin-bottom: 1rem;
             color: #1a1a1a;
             font-weight: 600;
         }
@@ -351,7 +406,7 @@
 
         /* Buttons */
         button, .button_1, .button_2, .button_3 {
-            padding: 1rem 2.5rem;
+            padding: 1rem 1.5rem;
             border-radius: 4px;
             font-size: 0.95rem;
             font-weight: 600;
@@ -382,9 +437,13 @@
         }
 
         .button_3 {
-            background: 0066cc;
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: #ffffff;
-            border: 2px solid #0066cc;
+            border: 4px solid #0066cc;
+            font-size: 1rem;
+            border-radius: 4px;
         }
 
         .button_2:hover, .button_3:hover {
@@ -404,26 +463,39 @@
            ========================================================================== */
         @media (max-width: 768px) {
             header { 
-                padding: 0 1.5rem;
+                padding: 1rem 1.5rem 0 1.5rem;
                 flex-wrap: wrap;
+                height: auto;
+                min-height: 10vh;
             }
             
             .header-left {
-                display: none;
+                flex: 0 0 auto;
+                order: 1;
+                display: flex;
+                align-items: center;
+            }
+            
+            .header-left img {
+                max-height: 35px;
             }
             
             .header-middle {
                 flex: 1 1 100%;
-                order: 2;
+                order: 3;
                 margin-top: 1rem;
+                padding-bottom: 1rem;
             }
             
             .header-right {
                 flex: 0 0 auto;
-                order: 1;
+                order: 2;
             }
             
-            nav { gap: 1.5rem; }
+            nav { 
+                gap: 1.5rem;
+                justify-content: center;
+            }
             .nav-widget { font-size: 0.85rem; }
             h1 { font-size: 2.5rem; }
             h2 { font-size: 1.75rem; }
@@ -436,18 +508,20 @@
 </head>
 <body>
     <div class="bg-overlay" id="global-bg-overlay">
-        <video autoplay loop muted playsinline id="about-bg-video">
-            <source id="about-video-source" type="video/mp4">
+        <video autoplay loop muted playsinline id="home-bg-video">
+            <source id="home-video-source" type="video/mp4">
             Your browser does not support the video tag.
         </video>
     </div>
 
     <header>
-        <div class="header-left"></div>
+        <div class="header-left">
+            <img src="../media/Logo.png" alt="Laplace Solutions Logo" onclick="document.getElementById('home').scrollIntoView({ behavior: 'smooth' })">
+        </div>
         <div class="header-middle">
             <nav>
-                <div class="nav-widget active" data-target="about">ABOUT US</div>
                 <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
+                <div class="nav-widget" data-target="about">ABOUT US</div>
                 <div class="nav-widget" data-target="contact">CONTACT US</div>
             </nav>
         </div>
@@ -458,10 +532,10 @@
 
     <main id="main-content">
         
-        <section id="about">
+        <section id="home">
             <div class="section-content">
-                <h1 style="color: #ffffff;">Transforming the future of <strong>finance and accounting</strong></h1>
-                <p class="subtitle" style="color: #ffffff;">As your trusted financial technology partner, we bridge the gap between finance and technology, delivering compliance-driven and optimization-focused solutions tailored for the modern enterprise.</p>
+                <h1 style="color: #ffffff;"><strong>Solving Complexity. Building Simplicity.</strong></h1>
+                <p class="subtitle" style="color: #ffffff;">We optimize your pricing, automate your operations, and engineer the tools you're missing. Turning complexity into a scalable advantage.</p>
                 <div class="cta-buttons">
                     <a href="#expertise" class="button_3">Learn More</a>
                     <a href="#contact" class="button_3">Schedule a Consultation</a>
@@ -471,46 +545,74 @@
 
         <section id="expertise">
             <div class="section-content">
-                <h2>What we do</h2>
-                <p>We strive to be your financial technology partner of preference, going the extra mile, above and beyond, and out of our way to ensure your organization receives best-in-class service and expertise.</p>
+                <h2>What we offer</h2>
+                <p>
+                    We translate complex challenges into engineered simplicity. From 
+                    pricing models to automated workflows, we engineer the integrated 
+                    infrastructure your business needs to make smarter decisions and 
+                    move faster.
+                </p>
                 
                 <div class="expertise-grid">
+
                     <div class="expertise-card">
-                        <div class="icon">💼</div>
-                        <h3>Corporate Finance Optimization</h3>
-                        <p>Streamlining financial processes and implementing advanced analytics to drive operational efficiency and strategic decision-making.</p>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">🎯</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Strategic Planning & Pricing</h3>
+                            </div>
+                        </div>
+                        <p>
+                            We transform your market positioning into a data-driven roadmap for growth.
+                            We engineer pricing models and strategic roadmaps that align your daily operations with high-level 
+                            financial goals, unlocking untapped value and fortifying your bottom line.
+                        </p>
                     </div>
-                    
+                                    
                     <div class="expertise-card">
-                        <div class="icon">🔄</div>
-                        <h3>Finance Digital Transformation</h3>
-                        <p>Modernizing legacy financial systems with cutting-edge technology solutions that enhance accuracy, speed, and compliance.</p>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">📈</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Performance Insight & Dashboards</h3>
+                            </div>
+                        </div>
+                        <p>
+                            Stop flying blind. We define the right metrics for your success and engineer the high-visibility
+                            tools to monitor them in real time. By building custom performance dashboards, we help you track
+                            what matters, spot risks before they scale, and lead your business with total clarity.
+                        </p>
                     </div>
-                    
+                
                     <div class="expertise-card">
-                        <div class="icon">📊</div>
-                        <h3>Actuarial Solutions</h3>
-                        <p>Delivering sophisticated actuarial modeling and risk assessment tools powered by advanced analytics and machine learning.</p>
-                    </div>
-                    
-                    <div class="expertise-card">
-                        <div class="icon">⚖️</div>
-                        <h3>Regulatory & Risk Advisory</h3>
-                        <p>Navigating complex regulatory landscapes with expert guidance on compliance frameworks including IFRS, GAAP, and ESG reporting standards.</p>
-                    </div>
-                    
-                    <div class="expertise-card">
-                        <div class="icon">🌱</div>
-                        <h3>ESG Transformation</h3>
-                        <p>Implementing comprehensive Environmental, Social, and Governance frameworks aligned with ISSB and CSRD requirements.</p>
-                    </div>
-                    
-                    <div class="expertise-card">
-                        <div class="icon">🎯</div>
-                        <h3>Strategic Consulting</h3>
-                        <p>Providing strategic guidance to help finance organizations navigate transformation initiatives and achieve measurable business outcomes.</p>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">⚙️</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Systems & Solution Engineering</h3>
+                            </div>
+                        </div>
+                        <p>
+                            We engineer custom solutions to automate repetitive tasks and streamline complex data 
+                            flows turning manual and error-prone processes into high-performance systems.
+                            Giving your business the technical edge usually reserved for much larger organizations
+                            without the overhead of a full-time team.
+                        </p>
                     </div>
                 </div>
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="section-content">
+                <h2>About Us</h2>
+                <p>
+                    [Add your about us content here - company story, mission, values, team information, etc.]
+                </p>
             </div>
         </section>
 
@@ -520,7 +622,7 @@
                 <p>Like what you have seen? Let's get started.</p>
                 
                 <div class="contact-form">
-                    <form>
+                    <form action="https://formspree.io/f/xgolevlg" method="POST">
                         <div class="form-group">
                             <label for="name">Name</label>
                             <input type="text" id="name" name="name" placeholder="Your name" required>
@@ -552,7 +654,7 @@
         const currentPath = window.location.pathname;
         const media_folder_path = '../media';
         
-        const videoSource = document.getElementById('about-video-source');
+        const videoSource = document.getElementById('home-video-source');
         if (videoSource) {
             videoSource.src = `${media_folder_path}/${mp4_file_name_1}`;
         }
@@ -563,6 +665,7 @@
         const navWidgets = document.querySelectorAll('.nav-widget');
         const sections = document.querySelectorAll('section');
         const header = document.querySelector('header');
+        const langSwitch = document.getElementById('lang-switch');
 
         // Smooth scroll implementation
         navWidgets.forEach(widget => {
@@ -581,8 +684,12 @@
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop === 0) {
                 header.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+                navWidgets.forEach(widget => widget.classList.remove('scrolled'));
+                langSwitch.classList.remove('scrolled');
             } else {
                 header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                navWidgets.forEach(widget => widget.classList.add('scrolled'));
+                langSwitch.classList.add('scrolled');
             }
         });
 
@@ -608,14 +715,6 @@
 
         sections.forEach(section => {
             observer.observe(section);
-        });
-
-        /**
-         * FORM SUBMISSION
-         */
-        document.querySelector('form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert('Thank you for your message! We\'ll get back to you soon.');
         });
     </script>
     
