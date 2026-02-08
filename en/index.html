@@ -465,24 +465,36 @@
             header { 
                 padding: 0 1.5rem;
                 flex-wrap: wrap;
+                height: auto;
+                min-height: 10vh;
             }
             
             .header-left {
-                display: none;
+                flex: 0 0 auto;
+                order: 1;
+                display: flex;
+            }
+            
+            .header-left img {
+                max-height: 50px;
             }
             
             .header-middle {
                 flex: 1 1 100%;
-                order: 2;
+                order: 3;
                 margin-top: 1rem;
+                padding-bottom: 1rem;
             }
             
             .header-right {
                 flex: 0 0 auto;
-                order: 1;
+                order: 2;
             }
             
-            nav { gap: 1.5rem; }
+            nav { 
+                gap: 1.5rem;
+                justify-content: center;
+            }
             .nav-widget { font-size: 0.85rem; }
             h1 { font-size: 2.5rem; }
             h2 { font-size: 1.75rem; }
@@ -507,7 +519,6 @@
         </div>
         <div class="header-middle">
             <nav>
-                <div class="nav-widget active" data-target="home">HOME</div>
                 <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
                 <div class="nav-widget" data-target="about">ABOUT US</div>
                 <div class="nav-widget" data-target="contact">CONTACT US</div>
