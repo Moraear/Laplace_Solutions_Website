@@ -305,6 +305,24 @@
             border-color: #d0d0d0;
         }
 
+        .expertise-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .expertise-header-left {
+            flex: 0 0 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .expertise-header-right {
+            flex: 0 0 80%;
+            padding-left: 1rem;
+        }
+
         .expertise-card .icon {
             width: 60px;
             height: 60px;
@@ -313,13 +331,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.5rem;
             font-size: 1.8rem;
         }
 
         .expertise-card h3 {
             font-size: 1.35rem;
-            margin-bottom: 1rem;
             color: #1a1a1a;
             font-weight: 600;
         }
@@ -509,8 +525,14 @@
                 
                 <div class="expertise-grid">
                     <div class="expertise-card">
-                        <div class="icon">🎯</div>
-                        <h3>Strategic Planning & Pricing</h3>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">🎯</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Strategic Planning & Pricing</h3>
+                            </div>
+                        </div>
                         <p>
                             Aligning market positioning with financial goals through data-driven roadmaps. 
                             We utilize competitive benchmarking and advanced pricing structures to 
@@ -519,8 +541,14 @@
                     </div>
                 
                     <div class="expertise-card">
-                        <div class="icon">📈</div>
-                        <h3>Modeling & Decision Support</h3>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">📈</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Modeling & Decision Support</h3>
+                            </div>
+                        </div>
                         <p>
                             Building robust quantitative frameworks for forecasting, liquidity, and 
                             scenario analysis. We translate complex datasets into clear, 
@@ -529,8 +557,14 @@
                     </div>
                 
                     <div class="expertise-card">
-                        <div class="icon">⚙️</div>
-                        <h3>Systems & Solution Engineering</h3>
+                        <div class="expertise-header">
+                            <div class="expertise-header-left">
+                                <div class="icon">⚙️</div>
+                            </div>
+                            <div class="expertise-header-right">
+                                <h3>Systems & Solution Engineering</h3>
+                            </div>
+                        </div>
                         <p>
                             We engineer custom solutions to automate repetitive tasks and streamline complex data 
                             flows turning manual and error-prone processes into high-performance systems.
