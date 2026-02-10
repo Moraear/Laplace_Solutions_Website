@@ -22,7 +22,7 @@
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             overflow-x: hidden;
             overflow-y: scroll;
-            background:rgb(0, 40, 80);
+            background: rgb(0, 40, 80);
             color: #1a1a1a;
             line-height: 1.6;
             position: relative;
@@ -57,8 +57,7 @@
         }
 
         .bg-overlay img,
-        .bg-overlay video,
-        .bg-overlay .tenor-gif-embed {
+        .bg-overlay video {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -672,7 +671,6 @@
          * Logic to resolve local paths for the background video.
          */
         const mp4_file_name_1 = 'Sample_4.mp4';
-        const currentPath = window.location.pathname;
         const media_folder_path = '../media';
         
         const videoSource = document.getElementById('home-video-source');
@@ -739,7 +737,6 @@
         });
     </script>
     
-    <script type="text/javascript" async src="https://tenor.com/embed.js"></script>
     <script src="../js/lang-switch.js"></script>
 </body>
 </html>
