@@ -30,52 +30,70 @@
         }
 
         /* ==========================================================================
-           2. BACKGROUND SYSTEM (Video & Overlays)
+           2. BACKGROUND SYSTEM (Per-Section Video Backgrounds)
            ========================================================================== */
-        #global-bg-overlay {
+
+        /* Container that holds all section background videos, fixed behind everything */
+        #section-bg-container {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             z-index: 0;
-            opacity: 0.6;
             pointer-events: none;
             overflow: hidden;
         }
 
-        .bg-overlay {
+        /* Each section's background layer: invisible by default, fades in when active */
+        .section-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 1;
-            opacity: 1;
-            pointer-events: none;
-            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.8s ease;
         }
 
-        .bg-overlay img,
-        .bg-overlay video {
+        /* The active section's background becomes visible */
+        .section-bg.active {
+            opacity: 1;
+        }
+
+        /* Video fills the entire background layer */
+        .section-bg video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Gradient overlay for background depth/fade */
-        .bg-overlay::after {
+        /* Optional tint overlay per section — adjust rgba to taste */
+        .section-bg::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0) 50%, 
-                rgba(255, 255, 255, 0) 100%);
-            z-index: 2;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+        }
+
+        /* #expertise and #about have lighter white tint */
+        #bg-expertise::after,
+        #bg-about::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0);
+            pointer-events: none;
+        }
+
+        /* #contact keeps the dark tint like #home */
+        #bg-contact::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            pointer-events: none;
         }
 
         /* ==========================================================================
@@ -231,11 +249,11 @@
             position: relative;
         }
 
-        /* Section Background logic */
+        /* Section Background logic — all transparent, video shows through */
         #home { background: transparent; }
-        #expertise { background: #ffffff; }
-        #about { background: #f8f9fa; }
-        #contact { background: #ffffff; }
+        #expertise { background: transparent; }
+        #about { background: transparent; }
+        #contact { background: transparent; }
 
         .section-content {
             max-width: 1200px;
@@ -465,6 +483,25 @@
             margin-top: 3rem;
         }
 
+        /* #expertise and #about: dark text over white tint */
+        #expertise .section-content h2,
+        #expertise .section-content p,
+        #about .section-content h2,
+        #about .section-content h3,
+        #about .section-content p {
+            color: #1a1a1a;
+        }
+
+        /* #contact: white text over dark video tint */
+        #contact .section-content h2,
+        #contact .section-content p {
+            color: #ffffff;
+        }
+
+        #contact label {
+            color: #ffffff;
+        }
+
         /* ==========================================================================
            7. RESPONSIVE DESIGN
            ========================================================================== */
@@ -514,11 +551,32 @@
     </style>
 </head>
 <body>
-    <div class="bg-overlay" id="global-bg-overlay">
-        <video autoplay loop muted playsinline id="home-bg-video">
-            <source id="home-video-source" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+    <!-- =====================================================================
+         PER-SECTION VIDEO BACKGROUNDS
+         Each .section-bg corresponds to one page section.
+         Set your MP4 filenames in the VIDEO CONFIGURATION script below.
+         ===================================================================== -->
+    <div id="section-bg-container">
+        <div class="section-bg active" id="bg-home">
+            <video autoplay loop muted playsinline id="home-bg-video">
+                <source id="home-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-expertise">
+            <video autoplay loop muted playsinline id="expertise-bg-video">
+                <source id="expertise-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-about">
+            <video autoplay loop muted playsinline id="about-bg-video">
+                <source id="about-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-contact">
+            <video autoplay loop muted playsinline id="contact-bg-video">
+                <source id="contact-video-source" type="video/mp4">
+            </video>
+        </div>
     </div>
 
     <header>
@@ -686,7 +744,7 @@
                             <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
                         </div>
                         
-                        <button type="submit">Send Message</button>
+                        <button type="submit" class="button_3">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -694,21 +752,32 @@
     </main>
 
     <script>
-        /**
-         * VIDEO CONFIGURATION
-         * Logic to resolve local paths for the background video.
-         */
-        const mp4_file_name_1 = 'Sample_4.mp4';
+        /* =====================================================================
+           VIDEO CONFIGURATION
+           Set the filename for each section's background video here.
+           All files are resolved from the media_folder_path below.
+           ===================================================================== */
         const media_folder_path = '../media';
-        
-        const videoSource = document.getElementById('home-video-source');
-        if (videoSource) {
-            videoSource.src = `${media_folder_path}/${mp4_file_name_1}`;
-        }
-        
-        /**
-         * NAVIGATION & SCROLLING
-         */
+
+        const sectionVideos = {
+            home:      'Sample_4.mp4',   // #home background
+            expertise: 'Sample_6.mp4',    // #expertise background
+            about:     'Sample_7.mp4',    // #about background
+            contact:   'Sample_5.mp4',   // #contact background
+        };
+
+        // Inject src attributes into each video source element
+        Object.entries(sectionVideos).forEach(([sectionId, filename]) => {
+            const sourceEl = document.getElementById(`${sectionId}-video-source`);
+            if (sourceEl) {
+                sourceEl.src = `${media_folder_path}/${filename}`;
+                sourceEl.closest('video').load();
+            }
+        });
+
+        /* =====================================================================
+           NAVIGATION & SCROLLING
+           ===================================================================== */
         const navWidgets = document.querySelectorAll('.nav-widget');
         const sections = document.querySelectorAll('section');
         const header = document.querySelector('header');
@@ -723,10 +792,10 @@
             });
         });
 
-        /**
-         * DYNAMIC HEADER STYLING
-         * Toggles header background based on scroll depth.
-         */
+        /* =====================================================================
+           DYNAMIC HEADER STYLING
+           Toggles header background based on scroll depth.
+           ===================================================================== */
         window.addEventListener('scroll', () => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop === 0) {
@@ -740,22 +809,32 @@
             }
         });
 
-        /**
-         * ACTIVE SECTION TRACKING
-         * Updates navigation UI based on the section currently in the viewport.
-         */
+        /* =====================================================================
+           ACTIVE SECTION TRACKING
+           Crossfades between section background videos as user scrolls.
+           Also updates navigation active state.
+           ===================================================================== */
         const observerOptions = {
             root: null,
-            threshold: 0.5 
+            threshold: 0.5
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const targetId = entry.target.id;
+
+                    // Update nav active state
                     navWidgets.forEach(widget => {
                         widget.classList.toggle('active', widget.getAttribute('data-target') === targetId);
                     });
+
+                    // Crossfade section backgrounds
+                    document.querySelectorAll('.section-bg').forEach(bg => {
+                        bg.classList.remove('active');
+                    });
+                    const activeBg = document.getElementById(`bg-${targetId}`);
+                    if (activeBg) activeBg.classList.add('active');
                 }
             });
         }, observerOptions);
