@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solutions Laplace</title>
+    <title>Laplace Solutions</title>
     <style>
         /* ==========================================================================
            1. CORE RESET & BASE STYLES
@@ -30,52 +30,79 @@
         }
 
         /* ==========================================================================
-           2. BACKGROUND SYSTEM (Video & Overlays)
+           2. BACKGROUND SYSTEM (Per-Section Video Backgrounds)
            ========================================================================== */
-        #global-bg-overlay {
+
+        /* Container that holds all section background videos, fixed behind everything */
+        #section-bg-container {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             z-index: 0;
-            opacity: 0.6;
             pointer-events: none;
             overflow: hidden;
         }
 
-        .bg-overlay {
+        /* Each section's background layer: invisible by default, fades in when active */
+        .section-bg {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 1;
-            opacity: 1;
-            pointer-events: none;
-            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.8s ease;
         }
 
-        .bg-overlay img,
-        .bg-overlay video {
+        /* The active section's background becomes visible */
+        .section-bg.active {
+            opacity: 1;
+        }
+
+        /* Video fills the entire background layer */
+        .section-bg video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Gradient overlay for background depth/fade */
-        .bg-overlay::after {
+        /* Optional tint overlay per section — adjust rgba to taste */
+        .section-bg::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0) 50%, 
-                rgba(255, 255, 255, 0) 100%);
-            z-index: 2;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            pointer-events: none;
+        }
+
+        /* #expertise and #about have lighter white tint */
+        #bg-expertise::after,
+        #bg-about::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0);
+            pointer-events: none;
+        }
+
+        /* #roadmap keeps the dark tint for glass card legibility */
+        #bg-roadmap::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.45);
+            pointer-events: none;
+        }
+
+        /* #contact keeps the dark tint like #home */
+        #bg-contact::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.35);
+            pointer-events: none;
         }
 
         /* ==========================================================================
@@ -104,7 +131,7 @@
         }
 
         .header-left img {
-            max-height: 60px;
+            max-height: 90px;
             width: auto;
             object-fit: contain;
             cursor: pointer;
@@ -231,11 +258,12 @@
             position: relative;
         }
 
-        /* Section Background logic */
+        /* Section Background logic — all transparent, video shows through */
         #home { background: transparent; }
-        #expertise { background: #ffffff; }
-        #about { background: #f8f9fa; }
-        #contact { background: #ffffff; }
+        #expertise { background: transparent; }
+        #about { background: transparent; }
+        #roadmap { background: transparent; }
+        #contact { background: transparent; }
 
         .section-content {
             max-width: 1200px;
@@ -277,6 +305,14 @@
             font-weight: 600;
         }
 
+        h3 {
+            font-size: 1.35rem;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
         p {
             font-size: 1.1rem;
             line-height: 1.8;
@@ -293,32 +329,155 @@
         }
 
         /* ==========================================================================
-           6. COMPONENTS (Expertise Grid, Buttons, Forms)
+           6. COMPONENTS (Expertise Carousel, Buttons, Forms)
            ========================================================================== */
-        
-        /* Grid Layout */
-        .expertise-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 3rem;
+
+        /* Carousel wrapper */
+        .expertise-carousel {
+            position: relative;
             margin-top: 4rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
-        /* Cards */
+        /* Arrow buttons */
+        .carousel-arrow {
+            flex-shrink: 0;
+            align-self: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.25s ease, transform 0.2s ease, opacity 0.25s ease;
+            z-index: 10;
+            padding: 0;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.28);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .carousel-arrow:active {
+            transform: scale(0.93);
+        }
+
+        .carousel-arrow svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Track that clips the visible area */
+        .carousel-track-wrapper {
+            flex: 1;
+            overflow: hidden;
+            padding: 2rem 0 2.5rem;
+        }
+
+        /* Sliding track */
+        .expertise-grid {
+            display: flex;
+            gap: 2rem;
+            transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+            will-change: transform;
+            align-items: center;
+        }
+
+        /* Flip Card Wrapper */
         .expertise-card {
-            background: #ffffff;
+            perspective: 1200px;
+            min-height: 510px;
+            flex: 0 0 calc(50.4% - 1rem);
+            cursor: pointer;
+            font-size: 1.35rem;
+            color: #1a1a1a;
+            font-weight: 600;
+            transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-origin: center center;
+        }
+
+        /* Dim and shrink non-active cards */
+        .expertise-card.carousel-prev,
+        .expertise-card.carousel-next {
+            opacity: 0.38;
+            filter: blur(1px);
+            pointer-events: none;
+            transform: scale(0.5);
+        }
+
+        /* Active card is fully visible, full size, and clickable */
+        .expertise-card.carousel-active {
+            opacity: 1;
+            filter: none;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 510px;
+            transform-style: preserve-3d;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1),
+                        box-shadow 0.3s ease,
+                        translate 0.3s ease;
             border-radius: 8px;
+        }
+
+        /* Lift on hover to signal flippability — active card only */
+        .expertise-card.carousel-active:hover .card-inner {
+            translate: 0 -8px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+        }
+
+        /* Flipped state */
+        .expertise-card.flipped .card-inner {
+            transform: rotateY(180deg);
+            translate: 0 0;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+        }
+
+        /* Front & Back shared */
+        .card-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             padding: 2.5rem;
-            transition: all 0.3s ease;
             border: 1px solid #e5e5e5;
         }
 
-        .expertise-card:hover {
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-            transform: translateY(-5px);
-            border-color: #d0d0d0;
+        /* Front face */
+        .card-front {
+            background: #ffffff;
         }
 
+        /* Back face — flipped 180° */
+        .card-back {
+            background: #0066cc;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Front face elements */
         .expertise-header {
             display: flex;
             align-items: center;
@@ -348,16 +507,133 @@
             font-size: 1.8rem;
         }
 
-        .expertise-card h3 {
-            font-size: 1.35rem;
+        .card-front h3 {
             color: #1a1a1a;
-            font-weight: 600;
         }
 
-        .expertise-card p {
+        .card-front p {
             font-size: 0.95rem;
             color: #666666;
             line-height: 1.7;
+        }
+
+        /* Flip hint on front face */
+        .flip-hint {
+            position: absolute;
+            bottom: 1.2rem;
+            right: 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #0066cc;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .flip-hint::after {
+            content: '↻';
+            font-size: 1rem;
+        }
+
+        .expertise-card.carousel-active:hover .flip-hint {
+            opacity: 1;
+        }
+
+        /* Back face elements */
+        .card-back h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 1.2rem;
+            opacity: 0.75;
+        }
+
+        .card-back ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .card-back ul li {
+            font-size: 0.88rem;
+            color: #ffffff;
+            line-height: 1.5;
+            font-weight: 400;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .card-back ul li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+        }
+
+        /* Back close hint */
+        .back-hint {
+            margin-top: 1.2rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .card-outcome {
+            margin-top: 1.1rem;
+            padding-top: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .card-outcome strong {
+            font-style: normal;
+            opacity: 0.6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.68rem;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        /* Dot indicators */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 1.5rem;
+        }
+
+        .carousel-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: background 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
+            border: none;
+            padding: 0;
+        }
+
+        .carousel-dot.active {
+            background: #ffffff;
+            transform: scale(1.3);
         }
 
         /* Form Controls */
@@ -457,75 +733,617 @@
             margin-top: 3rem;
         }
 
+        /* #expertise and #about: white text on all screen sizes */
+        #expertise .section-content h2,
+        #expertise .section-content p,
+        #about .section-content h2,
+        #about .section-content h3,
+        #about .section-content p {
+            color: #ffffff;
+        }
+
+        /* Expertise cards always have dark text (white card background) */
+        #expertise .section-content .card-front h3,
+        #expertise .section-content .card-front p {
+            color: #1a1a1a;
+        }
+
+        /* #contact: white text over dark video tint */
+        #contact .section-content h2,
+        #contact .section-content p {
+            color: #ffffff;
+        }
+
+        #contact label {
+            color: #ffffff;
+        }
+
         /* ==========================================================================
            7. RESPONSIVE DESIGN
            ========================================================================== */
+
+        /* Hamburger button — hidden on desktop */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0.4rem;
+            order: 3;
+            margin-left: 0.75rem;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #ffffff;
+            transition: background 0.3s, transform 0.3s, opacity 0.3s;
+        }
+
+        .hamburger.scrolled span { background: #666; }
+
+        /* Animated X state */
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
         @media (max-width: 768px) {
-            header { 
-                padding: 1rem 1.5rem 0 1.5rem;
-                flex-wrap: wrap;
-                height: auto;
-                min-height: 10vh;
+            header {
+                padding: 0 1.2rem;
+                height: 60px;
+                flex-wrap: nowrap;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
             }
-            
+
             .header-left {
-                flex: 0 0 auto;
+                flex: 1;
                 order: 1;
                 display: flex;
                 align-items: center;
+                justify-content: flex-start;
             }
-            
+
             .header-left img {
-                max-height: 35px;
+                max-height: 52px;
             }
-            
+
+            /* Nav panel: hidden by default, drops down when .open */
             .header-middle {
-                flex: 1 1 100%;
-                order: 3;
-                margin-top: 1rem;
-                padding-bottom: 1rem;
-            }
-            
-            .header-right {
-                flex: 0 0 auto;
-                order: 2;
-            }
-            
-            nav { 
-                gap: 1.5rem;
+                display: none;
+                position: absolute;
+                top: 60px;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                padding: 0.5rem 0 1.5rem;
+                flex: unset;
+                order: unset;
+                margin-top: 0;
+                z-index: 99;
                 justify-content: center;
+                align-items: center;
             }
-            .nav-widget { font-size: 0.85rem; }
-            h1 { font-size: 2.5rem; }
-            h2 { font-size: 1.75rem; }
+
+            .header-middle.open {
+                display: flex;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 0;
+                align-items: center;
+                width: 100%;
+            }
+
+            .nav-widget {
+                font-size: 0.9rem;
+                color: #ffffff !important;
+                padding: 0.9rem 2rem;
+                width: 100%;
+                text-align: center;
+            }
+
+            .nav-widget:hover,
+            .nav-widget.active {
+                color: #ffffff !important;
+                transform: none;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .header-right {
+                flex: 1;
+                order: 3;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+            }
+
+            #lang-switch {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+                border-width: 1.5px;
+            }
+
+            .hamburger {
+                flex: 1;
+                order: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-left: 0;
+            }
+
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.6rem; }
+            h3 { font-size: 1.2rem; }
             p, .subtitle { font-size: 1rem; }
-            section { padding: 3rem 1.5rem; }
-            .expertise-grid { gap: 2rem; }
-            .cta-buttons { flex-direction: column; }
+            section { padding: 2.5rem 1.2rem; }
+            section { scroll-margin-top: 60px; }
+            .expertise-grid { gap: 1.2rem; }
+
+            /* On mobile, active card takes up more width */
+            .expertise-card {
+                flex: 0 0 82%;
+                min-height: 375px;
+            }
+
+            .card-inner {
+                min-height: 375px;
+            }
+
+            .carousel-arrow {
+                width: 38px;
+                height: 38px;
+                font-size: 1rem;
+            }
+
+            #expertise .section-content .card-front h3,
+            #expertise .section-content .card-front p {
+                color: #1a1a1a !important;
+            }
+
+            .cta-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .cta-buttons a {
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+            }
         }
+
+        /* ==========================================================================
+           8. ROADMAP SECTION
+           ========================================================================== */
+
+        #roadmap .section-content h2,
+        #roadmap .section-content > p {
+            color: #ffffff;
+        }
+
+        /* Two-column layout: road on left, info panel on right */
+        .roadmap-layout {
+            display: grid;
+            grid-template-columns: 1fr 374px;
+            gap: 1.5rem;
+            margin-top: 4rem;
+            align-items: start;
+        }
+
+        /* ── SVG Road ─────────────────────────────────────────── */
+        .roadmap-road-wrap {
+            position: relative;
+            width: 100%;
+            padding: 1rem 0 2rem;
+        }
+
+        .roadmap-road-wrap svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            overflow: visible;
+        }
+
+        /* Icon stop buttons on the road */
+        .road-stop {
+            cursor: pointer;
+            transition: filter 0.3s ease, transform 0.3s ease;
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        .road-stop:hover,
+        .road-stop.active {
+            filter: drop-shadow(0 0 10px rgba(0, 153, 255, 0.85));
+        }
+
+        .road-stop.active .stop-icon-bg {
+            fill: #0066cc;
+        }
+
+        .road-stop .stop-icon-bg {
+            fill: rgba(255, 255, 255, 0.12);
+            stroke: rgba(255, 255, 255, 0.45);
+            stroke-width: 1.5;
+            transition: fill 0.3s ease;
+        }
+
+        /* Step label below each icon */
+        .stop-label {
+            fill: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            font-family: inherit;
+            font-weight: 600;
+            text-anchor: middle;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            pointer-events: none;
+            transition: fill 0.3s ease;
+        }
+
+        .road-stop.active .stop-label {
+            fill: #ffffff;
+        }
+
+        /* ── Info Panel (right column) ────────────────────────── */
+        /* ── Roadmap panel — flip card ────────────────────────── */
+
+        /* Outer wrapper: perspective container, fixed size */
+        .roadmap-panel {
+            perspective: 1200px;
+            height: 400px;
+            cursor: pointer;
+        }
+
+        /* The rotating inner */
+        .roadmap-panel-step {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1),
+                        box-shadow 0.3s ease,
+                        translate 0.3s ease;
+            border-radius: 12px;
+        }
+
+        /* Lift on hover */
+        .roadmap-panel:hover .roadmap-panel-step {
+            translate: 0 -6px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        /* Flipped state */
+        .roadmap-panel-step.panel-flipped {
+            transform: rotateY(180deg);
+            translate: 0 0;
+        }
+
+        /* Fade wrapper — opacity lives here, NOT on the preserve-3d element.
+           Animating opacity on a preserve-3d element collapses the 3D context
+           in browsers, causing the back face to render as a mirrored front. */
+        .roadmap-panel-wrap {
+            position: absolute;
+            inset: 0;
+            transition: opacity 0.22s ease;
+        }
+
+        /* Front & back shared */
+        .panel-face {
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            padding: 2rem 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Front — matches expertise card front exactly */
+        .panel-front {
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+        }
+
+        .panel-front .panel-step-num {
+            color: #0066cc;
+        }
+
+        .panel-front .panel-step-title {
+            color: #1a1a1a;
+        }
+
+        .panel-front .panel-strategy {
+            color: #666666;
+        }
+
+        .panel-front .panel-flip-hint {
+            color: #0066cc;
+        }
+
+        /* Back — solid blue like expertise card back */
+        .panel-back {
+            background: #0066cc;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transform: rotateY(180deg);
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        /* Flip hint */
+        .panel-flip-hint {
+            position: absolute;
+            bottom: 1.1rem;
+            right: 1.4rem;
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.45);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .panel-flip-hint::after { content: '↻'; font-size: 0.95rem; }
+
+        .roadmap-panel:hover .panel-flip-hint { opacity: 1; }
+
+        /* ── Front face content ───────────────────────────────── */
+        .panel-step-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.4rem;
+            padding-bottom: 1.1rem;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .panel-step-icon {
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+            background: #0066cc;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+        }
+
+        .panel-step-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: invert(1) brightness(1);
+        }
+
+        .panel-step-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .panel-step-num {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #0066cc;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .panel-step-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.2;
+        }
+
+        .panel-strategy {
+            font-size: 0.85rem;
+            color: #666666;
+            line-height: 1.7;
+            margin-bottom: 0;
+        }
+
+        /* ── Back face content ────────────────────────────────── */
+        .panel-section-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            margin-bottom: 0.55rem;
+        }
+
+        .panel-activities {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 1.1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .panel-activities li {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.88);
+            line-height: 1.5;
+            padding-left: 0.9rem;
+            position: relative;
+        }
+
+        .panel-activities li::before {
+            content: '—';
+            position: absolute;
+            left: 0;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.68rem;
+        }
+
+        .panel-outcome {
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 0.6rem 0.85rem;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.92);
+            line-height: 1.5;
+            font-style: italic;
+        }
+
+        .panel-outcome strong {
+            display: block;
+            font-style: normal;
+            font-size: 0.63rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-back-hint {
+            margin-top: 1rem;
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Roadmap nav arrows — sit below the panel in the right grid column */
+        .roadmap-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 0.9rem;
+        }
+
+        .roadmap-arrow {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.15s ease;
+            padding: 0;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .roadmap-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .roadmap-arrow:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: none;
+            box-shadow: none;
+        }
+
+        .roadmap-arrow:active {
+            transform: scale(0.93);
+        }
+
+        .roadmap-arrow:disabled {
+            opacity: 0.25;
+            cursor: default;
+        }
+
+        .roadmap-nav-counter {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            min-width: 2.5rem;
+            text-align: center;
+            letter-spacing: 0.3px;
+        }
+
+        /* Responsive — stack on smaller screens */
+        @media (max-width: 960px) {
+            .roadmap-layout {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+            .roadmap-panel {
+                height: 400px;
+            }
+        }
+
     </style>
 </head>
 <body>
-    <div class="bg-overlay" id="global-bg-overlay">
-        <video autoplay loop muted playsinline id="home-bg-video">
-            <source id="home-video-source" type="video/mp4">
-            Votre navigateur ne supporte pas la balise vidéo.
-        </video>
+    <!-- =====================================================================
+         PER-SECTION VIDEO BACKGROUNDS
+         Each .section-bg corresponds to one page section.
+         Set your MP4 filenames in the VIDEO CONFIGURATION script below.
+         ===================================================================== -->
+    <div id="section-bg-container">
+        <div class="section-bg active" id="bg-home">
+            <video autoplay loop muted playsinline id="home-bg-video">
+                <source id="home-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-expertise">
+            <video autoplay loop muted playsinline id="expertise-bg-video">
+                <source id="expertise-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-about">
+            <video autoplay loop muted playsinline id="about-bg-video">
+                <source id="about-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-contact">
+            <video autoplay loop muted playsinline id="contact-bg-video">
+                <source id="contact-video-source" type="video/mp4">
+            </video>
+        </div>
+        <div class="section-bg" id="bg-roadmap">
+            <video autoplay loop muted playsinline id="roadmap-bg-video">
+                <source id="roadmap-video-source" type="video/mp4">
+            </video>
+        </div>
     </div>
 
     <header>
         <div class="header-left">
-            <img src="../media/Logo.png" alt="Logo Solutions Laplace" onclick="document.getElementById('home').scrollIntoView({ behavior: 'smooth' })">
+            <img src="../media/Laplace-solutions_logo_blanc.svg" alt="Laplace Solutions Logo" onclick="document.getElementById('home').scrollIntoView({ behavior: 'smooth' })">
         </div>
         <div class="header-middle">
             <nav>
-                <div class="nav-widget" data-target="expertise">NOTRE EXPERTISE</div>
-                <div class="nav-widget" data-target="about">À PROPOS</div>
-                <div class="nav-widget" data-target="contact">NOUS CONTACTER</div>
+                <div class="nav-widget" data-target="about">ABOUT US</div>
+                <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
+                <div class="nav-widget" data-target="roadmap">OUR APPROACH</div>
+                <div class="nav-widget" data-target="contact">CONTACT US</div>
             </nav>
         </div>
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+            <span></span><span></span><span></span>
+        </button>
         <div class="header-right">
-            <button id="lang-switch">FR</button>
+            <button id="lang-switch">EN</button>
         </div>
     </header>
 
@@ -533,132 +1351,539 @@
         
         <section id="home">
             <div class="section-content">
-                <h1 style="color: #ffffff;"><strong>Résoudre la complexité. Construire la simplicité.</strong></h1>
-                <p class="subtitle" style="color: #ffffff;">Nous optimisons la tarification, offrons une visibilité en temps réel sur la performance et automatisons les opérations.<br>Augmentez vos marges, pas vos frais généraux.</p>
-                <div class="cta-buttons">
-                    <a href="#expertise" class="button_3">En savoir plus</a>
-                    <a href="#contact" class="button_3">Planifier une consultation</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="expertise">
-            <div class="section-content">
-                <h2>Ce que nous offrons</h2>
-                <p>
-                    La complexité est l'ennemi de la croissance.
-                    Nous comblons l'écart entre l'endroit où vos données résident et comment vous prenez vos décisions, en construisant les systèmes nécessaires pour une croissance disciplinée et rentable.
-                    Notre expertise repose sur trois piliers fondamentaux :
+                <h1 style="color: #ffffff;">
+                    <strong>
+                        Data Driven Strategy.<br>
+                        Scalable Technology.<br>
+                        <!-- CFO Services. -->
+                        <!-- CFO-Level Strategy. Scalable Tech. -->
+                        <!-- Smarter Pricing. Stronger Margins. -->
+                    </strong>
+                </h1>
+                <p class="subtitle" style="color: #ffffff;">
+                    We help you unlock the full potential of your profit by providing the strategic oversight your growth demands. <br>
+                    From cleaning up the books to building your future blueprint, we’re here to ensure your finances fuel your vision.<br><br>
+                    The CFO your business deserves, at the scale you need.
+                    <!-- Most companies don’t fail from a lack of revenue, they fail from poor cash flow management.<br>
+                    We build the financial infrastructure and provide the leadership you need to scale.<br> -->
+                    <!-- Get strategic clarity backed by systems that never miss a beat. -->
+                    <!-- We combine CFO‑level advisory with integrated technology to streamline your core accounting.<br>
+                    Get strategic clarity backed by systems that never miss a beat. -->
+                    <!-- We optimize pricing, deliver real‑time performance visibility, and automate operations.<br>
+                    Grow your margins, not your overhead. -->
                 </p>
-                
-                <div class="expertise-grid">
-
-                    <div class="expertise-card">
-                        <div class="expertise-header">
-                            <div class="expertise-header-left">
-                                <div class="icon">🎯</div>
-                            </div>
-                            <div class="expertise-header-right">
-                                <h3>Planification stratégique et tarification</h3>
-                            </div>
-                        </div>
-                        <p>
-                            Le profit est plus qu'une simple majoration. 
-                            Nous construisons des modèles de tarification qui tiennent compte de chaque coût caché, assurant que chaque vente est une victoire. 
-                            Construisez une entreprise qui se renforce à mesure qu'elle se développe, plutôt que de s'épuiser.
-                        </p>
-                    </div>
-                                    
-                    <div class="expertise-card">
-                        <div class="expertise-header">
-                            <div class="expertise-header-left">
-                                <div class="icon">📈</div>
-                            </div>
-                            <div class="expertise-header-right">
-                                <h3>Analyse de performance et tableaux de bord</h3>
-                            </div>
-                        </div>
-                        <p>
-                            Cessez de naviguer à l'aveugle.
-                            Nous définissons les métriques qui stimulent votre entreprise et créons des tableaux de bord en temps réel pour les suivre.
-                            Identifiez les risques tôt avant qu'ils ne deviennent des coûts.
-                        </p>
-                    </div>
-                
-                    <div class="expertise-card">
-                        <div class="expertise-header">
-                            <div class="expertise-header-left">
-                                <div class="icon">⚙️</div>
-                            </div>
-                            <div class="expertise-header-right">
-                                <h3>Ingénierie de systèmes et solutions</h3>
-                            </div>
-                        </div>
-                        <p>
-                            Chaque inefficacité est un coût.
-                            Nous concevons des systèmes qui rationalisent vos flux de travail — conçus pour l'évolutivité et l'adaptabilité à long terme.
-                            Augmentez votre production sans augmenter vos effectifs.
-                        </p>
-                    </div>
+                <div class="cta-buttons">
+                    <a href="#expertise" class="button_3">Learn More</a>
+                    <a href="#contact" class="button_3">Schedule a Consultation</a>
                 </div>
             </div>
         </section>
 
         <section id="about">
             <div class="section-content">
-                <h2>À propos de nous</h2>
+                <h2>
+                    About Us
+                </h2>
                 
                 <div class="about-block">
-                    <h3>Qui sommes-nous</h3>
+                    <h3>
+                        Who We Are
+                    </h3>
                     <p>
-                        Nous sommes une équipe de quatre actuaires chevronnés avec des décennies d'expérience dans des environnements financiers à enjeux élevés.
-                        Nos antécédents couvrent la gestion du risque des régimes de retraite, l'assurance IARD et l'analytique d'entreprise avancée — des industries où la marge d'erreur est nulle.
+                        We are a team of seasoned actuaries with decades of experience navigating high‑stakes financial environments.
+                        From pension risk to insurance analytics, we’ve spent our careers in industries where the margin for error is zero.
                     </p>
                 </div>
         
                 <div class="about-block">
-                    <h3>Notre mission</h3>
+                    <h3>
+                        Our Mission
+                    </h3>
                     <p>
-                        Nous traduisons la rigueur de niveau institutionnel en stratégie d'affaires concrète.
-                        Notre mission est de prendre les disciplines sophistiquées de modélisation et de gestion des risques du monde actuariel et de les appliquer aux entreprises axées sur la croissance.
-                        Nous construisons les systèmes qui garantissent que votre expansion est soutenue par une certitude mathématique.
+                        Our mission is to help organizations build resilient, well-governed businesses by transforming data and uncertainty into clear strategies. 
+                        Through actuarial rigor and forward-looking analysis, we design the processes and technology needed to ensure long-term financial health and sustainable growth.
+                        <!-- We replace guesswork with systems, ensuring every strategic move supports long‑term profitability. -->
+                        <!-- Our mission is to take the sophisticated modeling and risk‑management disciplines of the actuarial world and apply them to growth‑oriented companies. -->
                     </p>
                 </div>
         
                 <div class="about-block">
-                    <h3>Pourquoi des actuaires?</h3>
+                    <h3>
+                        Why Actuaries?
+                    </h3>
                     <p>
-                        Les actuaires sont formés pour anticiper des décennies dans le futur afin de résoudre les problèmes d'aujourd'hui.
-                        Alors que la plupart des analystes examinent ce qui s'est passé le trimestre dernier, nous analysons la mécanique structurelle de votre entreprise.
-                        Nous voyons au-delà du « bruit » des données brutes pour trouver les variables qui stimulent réellement la rentabilité et la stabilité à long terme.
+                        Actuaries possess a unique mastery over uncertainty and modelling the future.
+                        We bring this forward-looking expertise directly to your business decision-making in order to help you anticipate challenges, evaluate opportunities, and build resilient long-term plans.
+                        Guided by the rigorous ethical standards of our profession, we provide the objective advice necessary for your sustainable success.
+                        <!-- Actuaries don't just report on the past; we model the future. -->
+                        <!-- While most analysts look at what happened last quarter, we examine the underlying structural mechanics of your business. -->
+                        <!-- We strip away the noise and isolate the variables that distinguish success from failure. -->
                     </p>
                 </div>
             </div>
         </section>
 
-        <section id="contact">
+        <section id="expertise">
             <div class="section-content">
-                <h2>Changeons le jeu ensemble</h2>
-                <p>Vous aimez ce que vous avez vu? Commençons.</p>
+                <h2>
+                    Our Expertise
+                    <!-- What we offer -->
+                </h2>
+                <p>
+                    We perform an audit on your systems and financial operations to find the leakage.<br>
+                    We build the infrastructure for profitable growth through three core pillars:
+                    <!-- Data is only as valuable as the decisions it drives.<br> -->
+                    <!-- We implement the systems your margins need to thrive through three tactical pillars: -->
+                </p>
+
+                <div class="expertise-carousel">
+                    <button class="carousel-arrow" id="carousel-prev" aria-label="Previous card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="15 18 9 12 15 6"/>
+                        </svg>
+                    </button>
+
+                    <div class="carousel-track-wrapper">
+                        <div class="expertise-grid" id="expertise-grid">
+
+                            <div class="expertise-card" data-index="0">
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <div class="expertise-header">
+                                            <div class="expertise-header-left">
+                                                <div class="icon">🎯</div>
+                                            </div>
+                                            <div class="expertise-header-right">
+                                                <h3>Fractional CFO &<br> Strategic Leadership</h3>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            Our Fractional CFO services deliver high-impact financial leadership and executive-level oversight without the overhead of a full-time hire.<br><br>
+                                            We partner closely with your leadership team to sharpen financial governance, facilitate data-driven decision-making, and secure the long-term stability of your organization.
+                                        </p>
+                                        <span class="flip-hint">Details</span>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <h3>Key Services</h3>
+                                        <ul>
+                                            <li>Dynamic cash flow forecasting and proactive liquidity planning.</li>
+                                            <li>Strategic budget development and integrated financial planning.</li>
+                                            <li>Custom KPI architecture and real-time performance monitoring.</li>
+                                            <li>High-level decision support for executive leadership teams.</li>
+                                            <li>Advanced scenario analysis and long-range financial projections.</li>
+                                            <li>Sophisticated reporting for Boards and investors.</li>
+                                            <li>Comprehensive risk identification and mitigation planning.</li>
+                                            <li>Deep-dive profitability analysis and strategic cost optimization.</li>
+                                        </ul>
+                                        <div class="card-outcome"><strong>Outcome</strong>Robust financial governance, empowered decision-making, and a definitive long-term strategy.</div>
+                                        <p class="back-hint">Click to flip back</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="expertise-card" data-index="1">
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <div class="expertise-header">
+                                            <div class="expertise-header-left">
+                                                <div class="icon">📋</div>
+                                            </div>
+                                            <div class="expertise-header-right">
+                                                <h3>Accounting Oversight & Reporting</h3>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            We fortify your accounting operations by optimizing internal processes, verifying financial integrity, and mentoring internal teams.<br><br>
+                                            Our goal is to instill total transparency and ensure that every report is accurate, timely, and a true reflection of your business health.
+                                        </p>
+                                        <span class="flip-hint">Details</span>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <h3>Key Services</h3>
+                                        <ul>
+                                            <li>Executive review and oversight of month-end closing processes.</li>
+                                            <li>Rigorous account reconciliation and reporting validation.</li>
+                                            <li>Continuous optimization of accounting workflows.</li>
+                                            <li>Design and documentation of robust internal controls.</li>
+                                            <li>Expert coordination of year-end reporting with external auditors.</li>
+                                            <li>Detailed financial statement analysis and quality reviews.</li>
+                                            <li>Implementation of accounting system and software improvements.</li>
+                                            <li>Strategic support and training for finance and accounting staff.</li>
+                                        </ul>
+                                        <div class="card-outcome"><strong>Outcome</strong>Reliable, audit-ready reporting, strengthened internal controls, and a high-efficiency accounting function.</div>
+                                        <p class="back-hint">Click to flip back</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="expertise-card" data-index="2">
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <div class="expertise-header">
+                                            <div class="expertise-header-left">
+                                                <div class="icon">🤝</div>
+                                            </div>
+                                            <div class="expertise-header-right">
+                                                <h3>Mergers & Acquisitions Advisory</h3>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            We guide businesses through every stage of the M&A lifecycle, ensuring that growth through acquisition is both strategic and sustainable.<br><br>
+                                            Our firm provides the analytical depth required to evaluate opportunities, structure complex transactions, and seamlessly integrate operations to capture long-term value.
+                                        </p>
+                                        <span class="flip-hint">Details</span>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <h3>Key Services</h3>
+                                        <ul>
+                                            <li>Targeted acquisition evaluation and rigorous financial analysis.</li>
+                                            <li>Comprehensive due diligence support and risk assessment.</li>
+                                            <li>Advanced financial modeling and precision valuation analysis.</li>
+                                            <li>Strategic transaction structuring and deal-side negotiation strategy.</li>
+                                            <li>Capital planning and financing strategy optimization.</li>
+                                            <li>Post-merger integration planning and operational alignment.</li>
+                                            <li>Performance monitoring and synergy realization tracking.</li>
+                                        </ul>
+                                        <div class="card-outcome"><strong>Outcome</strong>Highly informed investment decisions and seamless transaction execution.</div>
+                                        <p class="back-hint">Click to flip back</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="expertise-card" data-index="3">
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <div class="expertise-header">
+                                            <div class="expertise-header-left">
+                                                <div class="icon">⚙️</div>
+                                            </div>
+                                            <div class="expertise-header-right">
+                                                <h3>Systems, Data & Automation</h3>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            We empower organizations to modernize their financial and operational infrastructure through intelligent technology integration.<br><br>
+                                            By refining data architecture and deploying advanced analytical tools, we transform fragmented information into a unified engine for superior decision-making.
+                                        </p>
+                                        <span class="flip-hint">Details</span>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <h3>Key Services</h3>
+                                        <ul>
+                                            <li>Strategic ERP and CRM system implementation and oversight.</li>
+                                            <li>Financial data architecture design and robust governance.</li>
+                                            <li>End-to-end process automation and workflow optimization.</li>
+                                            <li>Unified data consolidation and executive reporting frameworks.</li>
+                                            <li>Development of bespoke analytics models and forecasting tools.</li>
+                                            <li>Interactive Business Intelligence (BI) dashboards and real-time reporting.</li>
+                                            <li>Seamless integration between operational and accounting ecosystems.</li>
+                                        </ul>
+                                        <div class="card-outcome"><strong>Outcome</strong>Unmatched operational efficiency, superior data integrity, and total visibility into business performance.</div>
+                                        <p class="back-hint">Click to flip back</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="expertise-card" data-index="4">
+                                <div class="card-inner">
+                                    <div class="card-face card-front">
+                                        <div class="expertise-header">
+                                            <div class="expertise-header-left">
+                                                <div class="icon">🔄</div>
+                                            </div>
+                                            <div class="expertise-header-right">
+                                                <h3>Restructuring &<br> Business Turnaround</h3>
+                                            </div>
+                                        </div>
+                                        <p>
+                                            When organizations face critical operational or liquidity challenges, we provide the structured leadership necessary to stabilize the foundation and restore long-term viability.<br><br>
+                                            We act as a steady hand, transforming financial distress into a disciplined, data-backed recovery strategy that protects value and secures the future.
+                                        </p>
+                                        <span class="flip-hint">Details</span>
+                                    </div>
+                                    <div class="card-face card-back">
+                                        <h3>Key Services</h3>
+                                        <ul>
+                                            <li>Deep-dive financial diagnostics and performance stress testing.</li>
+                                            <li>Immediate cash flow stabilization and strategic liquidity planning.</li>
+                                            <li>Debt restructuring and professional lead-negotiator support for lenders.</li>
+                                            <li>Aggressive cost-reduction strategies and operational efficiency initiatives.</li>
+                                            <li>Comprehensive turnaround strategy development and execution.</li>
+                                            <li>Transparent communication management for stakeholders and creditors.</li>
+                                            <li>Rigorous monitoring and hands-on implementation of recovery plans.</li>
+                                        </ul>
+                                        <div class="card-outcome"><strong>Outcome</strong>Restored financial stability, instilled operational discipline, and a definitive roadmap toward sustainable recovery.</div>
+                                        <p class="back-hint">Click to flip back</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <button class="carousel-arrow" id="carousel-next" aria-label="Next card">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="carousel-dots" id="carousel-dots"></div>
+
+            </div>
+        </section>
+
+        <section id="roadmap">
+            <div class="section-content">
+                <h2>From Data to Direction: Our 4-Step Roadmap</h2>
+                <!-- <p>Click an icon or use the arrows to explore each step of our process.</p> -->
+
+                <div class="roadmap-layout">
+
+                    <!-- ── Winding Road SVG ────────────────────────── -->
+                    <div class="roadmap-road-wrap">
+                        <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <defs>
+                                <filter id="road-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                                    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="rgba(0,0,0,0.45)"/>
+                                </filter>
+                                <linearGradient id="roadGrad" x1="0" y1="0" x2="1" y2="0">
+                                    <stop offset="0%"   stop-color="#1a3a5c"/>
+                                    <stop offset="100%" stop-color="#0d2a47"/>
+                                </linearGradient>
+                            </defs>
+
+                            <!--
+                                S-curve path:
+                                Start bottom-left → arc up to peak (stop 2) → cross midpoint (stop 3) → arc down to right (stop 4)
+                                Stop 1 sits at the start, stop 2 at the top of the first arc,
+                                stop 3 at the valley/midpoint, stop 4 at the end.
+                            -->
+
+                            <!-- Road glow/shadow layer -->
+                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
+                                  fill="none"
+                                  stroke="rgba(0, 102, 204, 0.15)"
+                                  stroke-width="44"
+                                  stroke-linecap="round"
+                                  filter="url(#road-shadow)"/>
+
+                            <!-- Road body -->
+                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
+                                  fill="none"
+                                  stroke="url(#roadGrad)"
+                                  stroke-width="28"
+                                  stroke-linecap="round"/>
+
+                            <!-- Road centre dashes -->
+                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
+                                  fill="none"
+                                  stroke="rgba(255,255,255,0.22)"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-dasharray="14 10"/>
+
+                            <!-- ── Stop 1: Diagnose — bottom-left start ── -->
+                            <g class="road-stop" data-step="0" transform="translate(40, 230)">
+                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
+                                <image href="../media/Diagnose_Icon.png"
+                                       x="-17" y="-17" width="34" height="34"
+                                       style="filter:invert(1) brightness(0.9)"/>
+                                <text class="stop-label" x="0" y="46">Diagnose</text>
+                            </g>
+
+                            <!-- ── Stop 2: Model — top of first arc ── -->
+                            <g class="road-stop" data-step="1" transform="translate(200, 75)">
+                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
+                                <image href="../media/Model_Icon.png"
+                                       x="-17" y="-17" width="34" height="34"
+                                       style="filter:invert(1) brightness(0.9)"/>
+                                <text class="stop-label" x="0" y="46">Model</text>
+                            </g>
+
+                            <!-- ── Stop 3: Implement — valley between arcs ── -->
+                            <g class="road-stop" data-step="2" transform="translate(320, 205)">
+                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
+                                <image href="../media/Implement_Icon.png"
+                                       x="-17" y="-17" width="34" height="34"
+                                       style="filter:invert(1) brightness(0.9)"/>
+                                <text class="stop-label" x="0" y="46">Implement</text>
+                            </g>
+
+                            <!-- ── Stop 4: Monitor — top-right end ── -->
+                            <g class="road-stop" data-step="3" transform="translate(520, 70)">
+                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
+                                <image href="../media/Monitor_Icon.png"
+                                       x="-17" y="-17" width="34" height="34"
+                                       style="filter:invert(1) brightness(0.9)"/>
+                                <text class="stop-label" x="0" y="46">Monitor</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <!-- ── Info Panel + Nav ────────────────────────── -->
+                    <div style="display:flex; flex-direction:column;">
+                    <div class="roadmap-panel" id="roadmap-panel">
+
+                        <!-- Step 1: Diagnose -->
+                        <div class="roadmap-panel-wrap" data-panel="0">
+                        <div class="roadmap-panel-step">
+                            <div class="panel-face panel-front">
+                                <div class="panel-step-header">
+                                    <div class="panel-step-icon"><img src="../media/Diagnose_Icon.png" alt="Diagnose"></div>
+                                    <div class="panel-step-meta">
+                                        <span class="panel-step-num">Step 01</span>
+                                        <span class="panel-step-title">Diagnose</span>
+                                    </div>
+                                </div>
+                                <p class="panel-strategy">We develop a comprehensive understanding of your organization's financial health, operational structure, and risk profile. Through structured analysis and leadership discussions, we pinpoint inefficiencies, hidden exposures, and high-impact opportunities.</p>
+                                <span class="panel-flip-hint">Activities</span>
+                            </div>
+                            <div class="panel-face panel-back">
+                                <p class="panel-section-label">Typical Activities</p>
+                                <ul class="panel-activities">
+                                    <li>Comprehensive review of financial statements and operational data.</li>
+                                    <li>Deep-dive analysis of cash flow patterns and liquidity risks.</li>
+                                    <li>Assessment of accounting processes and reporting structures.</li>
+                                    <li>Evaluation of existing systems and data integrity.</li>
+                                    <li>Identification of operational bottlenecks and risk exposures.</li>
+                                    <li>Performance benchmarking against key industry metrics.</li>
+                                </ul>
+                                <div class="panel-outcome"><strong>Outcome</strong>A definitive diagnostic of your current financial health and a prioritized roadmap for improvement.</div>
+                                <p class="panel-back-hint">Click to flip back</p>
+                            </div>
+                        </div>
+                        </div><!-- /.roadmap-panel-wrap -->
+
+                        <!-- Step 2: Model -->
+                        <div class="roadmap-panel-wrap" data-panel="1">
+                        <div class="roadmap-panel-step">
+                            <div class="panel-face panel-front">
+                                <div class="panel-step-header">
+                                    <div class="panel-step-icon"><img src="../media/Model_Icon.png" alt="Model"></div>
+                                    <div class="panel-step-meta">
+                                        <span class="panel-step-num">Step 02</span>
+                                        <span class="panel-step-title">Model</span>
+                                    </div>
+                                </div>
+                                <p class="panel-strategy">Leveraging advanced analytics and actuarial-grade forecasting, we simulate various scenarios and project future outcomes. We move beyond static budgets to help you visualize how today's decisions will impact tomorrow's results.</p>
+                                <span class="panel-flip-hint">Activities</span>
+                            </div>
+                            <div class="panel-face panel-back">
+                                <p class="panel-section-label">Typical Activities</p>
+                                <ul class="panel-activities">
+                                    <li>Dynamic cash flow forecasting and long-term financial projections.</li>
+                                    <li>Advanced scenario modeling and sensitivity analysis.</li>
+                                    <li>Risk quantification and rigorous stress testing.</li>
+                                    <li>Development of customized financial planning and budgeting models.</li>
+                                    <li>Strategic capital and liquidity planning.</li>
+                                    <li>Decision-support modeling for major investments or acquisitions.</li>
+                                </ul>
+                                <div class="panel-outcome"><strong>Outcome</strong>A forward-looking perspective on risks and rewards that empowers confident strategic planning.</div>
+                                <p class="panel-back-hint">Click to flip back</p>
+                            </div>
+                        </div>
+                        </div><!-- /.roadmap-panel-wrap -->
+
+                        <!-- Step 3: Implement -->
+                        <div class="roadmap-panel-wrap" data-panel="2">
+                        <div class="roadmap-panel-step">
+                            <div class="panel-face panel-front">
+                                <div class="panel-step-header">
+                                    <div class="panel-step-icon"><img src="../media/Implement_Icon.png" alt="Implement"></div>
+                                    <div class="panel-step-meta">
+                                        <span class="panel-step-num">Step 03</span>
+                                        <span class="panel-step-title">Implement</span>
+                                    </div>
+                                </div>
+                                <p class="panel-strategy">Insight without action is a lost opportunity. We partner closely with your management team to deploy practical, high-impact solutions that modernize financial management, streamline operations, and sharpen decision-making at every level.</p>
+                                <span class="panel-flip-hint">Activities</span>
+                            </div>
+                            <div class="panel-face panel-back">
+                                <p class="panel-section-label">Typical Activities</p>
+                                <ul class="panel-activities">
+                                    <li>Modernization of accounting workflows and reporting standards.</li>
+                                    <li>Development of intuitive KPI dashboards and performance monitoring tools.</li>
+                                    <li>Strategic deployment of ERP, CRM, and advanced reporting systems.</li>
+                                    <li>Automation of manual financial workflows and data processing.</li>
+                                    <li>Hands-on support for organizational restructuring or strategic pivots.</li>
+                                    <li>Direct coordination with external auditors, advisors, and financial institutions.</li>
+                                </ul>
+                                <div class="panel-outcome"><strong>Outcome</strong>Tangible operational improvements that reinforce your financial foundation and organizational efficiency.</div>
+                                <p class="panel-back-hint">Click to flip back</p>
+                            </div>
+                        </div>
+                        </div><!-- /.roadmap-panel-wrap -->
+
+                        <!-- Step 4: Monitor -->
+                        <div class="roadmap-panel-wrap" data-panel="3">
+                        <div class="roadmap-panel-step">
+                            <div class="panel-face panel-front">
+                                <div class="panel-step-header">
+                                    <div class="panel-step-icon"><img src="../media/Monitor_Icon.png" alt="Monitor"></div>
+                                    <div class="panel-step-meta">
+                                        <span class="panel-step-num">Step 04</span>
+                                        <span class="panel-step-title">Monitor</span>
+                                    </div>
+                                </div>
+                                <p class="panel-strategy">High-performing organizations never stop evolving. We establish the governance frameworks and monitoring tools necessary for management to track real-time performance, identify emerging risks early, and pivot strategies before challenges become crises.</p>
+                                <span class="panel-flip-hint">Activities</span>
+                            </div>
+                            <div class="panel-face panel-back">
+                                <p class="panel-section-label">Typical Activities</p>
+                                <ul class="panel-activities">
+                                    <li>Continuous KPI tracking and executive performance reporting.</li>
+                                    <li>Real-time cash flow and liquidity monitoring.</li>
+                                    <li>Implementation of comprehensive risk-monitoring frameworks.</li>
+                                    <li>Facilitation of periodic financial and strategic reviews with leadership.</li>
+                                    <li>Ongoing strategic planning updates and tactical adjustments.</li>
+                                </ul>
+                                <div class="panel-outcome"><strong>Outcome</strong>Enhanced visibility, robust governance, and a culture of proactive risk management.</div>
+                                <p class="panel-back-hint">Click to flip back</p>
+                            </div>
+                        </div>
+                        </div><!-- /.roadmap-panel-wrap -->
+
+                    </div><!-- /.roadmap-panel -->
+
+                    <!-- Nav arrows sit below the panel, outside it -->
+                    <div class="roadmap-nav">
+                        <button class="roadmap-arrow" id="roadmap-prev" aria-label="Previous step">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <span class="roadmap-nav-counter" id="roadmap-counter">1 / 4</span>
+                        <button class="roadmap-arrow" id="roadmap-next" aria-label="Next step">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                    </div><!-- /.panel+nav column -->
+                </div><!-- /.roadmap-layout -->
+            </div>
+        </section>
+
+                        <section id="contact">
+            <div class="section-content">
+                <h2>Let's change the game together</h2>
+                <p>Like what you have seen? Let's get started.</p>
                 
                 <div class="contact-form">
                     <form action="https://formspree.io/f/xgolevlg" method="POST">
                         <div class="form-group">
-                            <label for="name">Nom</label>
-                            <input type="text" id="name" name="name" placeholder="Votre nom" required>
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="email">Courriel</label>
-                            <input type="email" id="email" name="email" placeholder="votre.courriel@exemple.com" required>
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="message">Message</label>
-                            <textarea id="message" name="message" placeholder="Parlez-nous de votre projet..." required></textarea>
+                            <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
                         </div>
                         
-                        <button type="submit">Envoyer le message</button>
+                        <button type="submit" class="button_3">Send Message</button>
                     </form>
                 </div>
             </div>
@@ -666,21 +1891,33 @@
     </main>
 
     <script>
-        /**
-         * VIDEO CONFIGURATION
-         * Logic to resolve local paths for the background video.
-         */
-        const mp4_file_name_1 = 'Sample_4.mp4';
+        /* =====================================================================
+           VIDEO CONFIGURATION
+           Set the filename for each section's background video here.
+           All files are resolved from the media_folder_path below.
+           ===================================================================== */
         const media_folder_path = '../media';
-        
-        const videoSource = document.getElementById('home-video-source');
-        if (videoSource) {
-            videoSource.src = `${media_folder_path}/${mp4_file_name_1}`;
-        }
-        
-        /**
-         * NAVIGATION & SCROLLING
-         */
+
+        const sectionVideos = {
+            home:      'Sample_5.mp4',
+            expertise: 'Sample_5.mp4',
+            about:     'Sample_5.mp4',
+            roadmap:   'Sample_5.mp4',
+            contact:   'Sample_5.mp4',
+        };
+
+        // Inject src attributes into each video source element
+        Object.entries(sectionVideos).forEach(([sectionId, filename]) => {
+            const sourceEl = document.getElementById(`${sectionId}-video-source`);
+            if (sourceEl) {
+                sourceEl.src = `${media_folder_path}/${filename}`;
+                sourceEl.closest('video').load();
+            }
+        });
+
+        /* =====================================================================
+           NAVIGATION & SCROLLING
+           ===================================================================== */
         const navWidgets = document.querySelectorAll('.nav-widget');
         const sections = document.querySelectorAll('section');
         const header = document.querySelector('header');
@@ -695,11 +1932,11 @@
             });
         });
 
-        /**
-         * DYNAMIC HEADER STYLING
-         * Toggles header background based on scroll depth.
-         */
-        window.addEventListener('scroll', () => {
+        /* =====================================================================
+           DYNAMIC HEADER STYLING — disabled for now
+           Toggles header background based on scroll depth.
+           ===================================================================== */
+        /* window.addEventListener('scroll', () => {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop === 0) {
                 header.style.backgroundColor = 'rgba(255, 255, 255, 0)';
@@ -710,31 +1947,267 @@
                 navWidgets.forEach(widget => widget.classList.add('scrolled'));
                 langSwitch.classList.add('scrolled');
             }
-        });
+        }); */
 
-        /**
-         * ACTIVE SECTION TRACKING
-         * Updates navigation UI based on the section currently in the viewport.
-         */
+        /* =====================================================================
+           ACTIVE SECTION TRACKING
+           Crossfades between section background videos as user scrolls.
+           Also updates navigation active state.
+           ===================================================================== */
         const observerOptions = {
             root: null,
-            threshold: 0.5 
+            threshold: 0.5
         };
 
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const targetId = entry.target.id;
+
+                    // Update nav active state
                     navWidgets.forEach(widget => {
                         widget.classList.toggle('active', widget.getAttribute('data-target') === targetId);
                     });
+
+                    // Crossfade section backgrounds
+                    document.querySelectorAll('.section-bg').forEach(bg => {
+                        bg.classList.remove('active');
+                    });
+                    const activeBg = document.getElementById(`bg-${targetId}`);
+                    if (activeBg) activeBg.classList.add('active');
                 }
             });
         }, observerOptions);
 
-        sections.forEach(section => {
-            observer.observe(section);
+        /* =====================================================================
+           HAMBURGER MENU
+           ===================================================================== */
+        const hamburger = document.getElementById('hamburger');
+        const headerMiddle = document.querySelector('.header-middle');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('open');
+            headerMiddle.classList.toggle('open');
         });
+
+        // Close menu when a nav item is clicked
+        navWidgets.forEach(widget => {
+            widget.addEventListener('click', () => {
+                hamburger.classList.remove('open');
+                headerMiddle.classList.remove('open');
+            });
+        });
+
+        // Update hamburger span colour on scroll — disabled for now
+        // window.addEventListener('scroll', () => {
+        //     const scrolled = (window.pageYOffset || document.documentElement.scrollTop) > 0;
+        //     hamburger.classList.toggle('scrolled', scrolled);
+        // });
+
+        /* =====================================================================
+           ROADMAP INTERACTION — click / keyboard navigation
+           ===================================================================== */
+        (function () {
+            const stops    = document.querySelectorAll('.road-stop');
+            const wraps    = document.querySelectorAll('.roadmap-panel-wrap');
+            const panelBox = document.getElementById('roadmap-panel');
+            const prevBtn  = document.getElementById('roadmap-prev');
+            const nextBtn  = document.getElementById('roadmap-next');
+            const counter  = document.getElementById('roadmap-counter');
+            const total    = stops.length;
+            let current    = 0;
+
+            // Helper: get the inner flip element from a wrap
+            function stepOf(wrap) { return wrap.querySelector('.roadmap-panel-step'); }
+
+            // Pre-set all wrappers: first visible, rest hidden
+            wraps.forEach((w, i) => {
+                w.style.display = i === 0 ? 'block' : 'none';
+                w.style.opacity = i === 0 ? '1'     : '0';
+            });
+
+            // Panel box needs relative positioning to contain absolute children
+            panelBox.style.position = 'relative';
+
+            function goTo(idx) {
+                if (idx === current) return;
+                const prev = current;
+                current = Math.max(0, Math.min(idx, total - 1));
+
+                // Swap active stop markers
+                stops.forEach((s, i) => s.classList.toggle('active', i === current));
+
+                const outWrap = wraps[prev];
+                const inWrap  = wraps[current];
+
+                // Step 1: fade out the WRAPPER (opacity never touches preserve-3d element,
+                // so the 3D context stays intact and no flip artifact appears).
+                outWrap.style.transition = 'opacity 0.22s ease';
+                outWrap.style.opacity    = '0';
+
+                setTimeout(() => {
+                    // Step 2: panel is invisible — silently reset flip on inner step
+                    stepOf(outWrap).classList.remove('panel-flipped');
+                    outWrap.style.display = 'none';
+
+                    // Step 3: show incoming wrapper on front face, then fade in
+                    stepOf(inWrap).classList.remove('panel-flipped');
+                    inWrap.style.transition = 'none';
+                    inWrap.style.opacity    = '0';
+                    inWrap.style.display    = 'block';
+
+                    requestAnimationFrame(() => requestAnimationFrame(() => {
+                        inWrap.style.transition = 'opacity 0.28s ease';
+                        inWrap.style.opacity    = '1';
+                    }));
+                }, 230);
+
+                counter.textContent = `${current + 1} / ${total}`;
+                prevBtn.disabled    = current === 0;
+                nextBtn.disabled    = current === total - 1;
+            }
+
+            // Flip the inner step element on click (not the wrapper)
+            panelBox.addEventListener('click', () => {
+                stepOf(wraps[current]).classList.toggle('panel-flipped');
+            });
+
+            // Initialise
+            stops.forEach((s, i) => s.classList.toggle('active', i === 0));
+            prevBtn.disabled = true;
+
+            // Click a road stop icon
+            stops.forEach((stop, i) => {
+                stop.addEventListener('click', e => {
+                    e.stopPropagation(); // don't bubble to panelBox
+                    goTo(i);
+                });
+            });
+
+            // Arrow buttons
+            prevBtn.addEventListener('click', () => goTo(current - 1));
+            nextBtn.addEventListener('click', () => goTo(current + 1));
+
+            // Keyboard arrows when roadmap section is in view
+            document.addEventListener('keydown', e => {
+                const roadmap = document.getElementById('roadmap');
+                const rect    = roadmap.getBoundingClientRect();
+                if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
+                if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
+                if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+            });
+        })();
+
+        /* =====================================================================
+           EXPERTISE CAROUSEL
+           ===================================================================== */
+        (function () {
+            const grid      = document.getElementById('expertise-grid');
+            const prevBtn   = document.getElementById('carousel-prev');
+            const nextBtn   = document.getElementById('carousel-next');
+            const dotsWrap  = document.getElementById('carousel-dots');
+            const cards     = Array.from(grid.querySelectorAll('.expertise-card'));
+            const total     = cards.length;
+            let current     = 0;
+
+            // Build dot indicators
+            cards.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+                dot.setAttribute('aria-label', `Go to card ${i + 1}`);
+                dot.addEventListener('click', () => goTo(i));
+                dotsWrap.appendChild(dot);
+            });
+
+            function getCardWidth() {
+                // Full width of one card + gap
+                const gap = parseInt(getComputedStyle(grid).gap) || 32;
+                return cards[0].offsetWidth + gap;
+            }
+
+            function updateCarousel() {
+                const cardW = getCardWidth();
+
+                // Centre the active card inside the track wrapper
+                const wrapperW = grid.parentElement.offsetWidth;
+                const offset   = (wrapperW / 2) - (cards[0].offsetWidth / 2) - (current * cardW);
+                grid.style.transform = `translateX(${offset}px)`;
+
+                // State classes
+                cards.forEach((card, i) => {
+                    card.classList.remove('carousel-active', 'carousel-prev', 'carousel-next');
+                    if (i === current)           card.classList.add('carousel-active');
+                    else if (i === current - 1)  card.classList.add('carousel-prev');
+                    else if (i === current + 1)  card.classList.add('carousel-next');
+                    else {
+                        // Cards further away: treat like prev/next for styling
+                        card.classList.add(i < current ? 'carousel-prev' : 'carousel-next');
+                    }
+
+                    // Unflip non-active cards when navigating away
+                    if (i !== current) card.classList.remove('flipped');
+                });
+
+                // Update dots
+                dotsWrap.querySelectorAll('.carousel-dot').forEach((dot, i) => {
+                    dot.classList.toggle('active', i === current);
+                });
+
+                // Arrow disabled states — always enabled for looping
+                prevBtn.disabled = false;
+                nextBtn.disabled = false;
+            }
+
+            function goTo(index) {
+                // Wrap around for infinite loop
+                current = ((index % total) + total) % total;
+                updateCarousel();
+            }
+
+            // Flip only the active card on click
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    if (card.classList.contains('carousel-active')) {
+                        card.classList.toggle('flipped');
+                    }
+                });
+            });
+
+            prevBtn.addEventListener('click', () => goTo(current - 1));
+            nextBtn.addEventListener('click', () => goTo(current + 1));
+
+            // Keyboard navigation when focused within the carousel
+            document.addEventListener('keydown', e => {
+                const inCarousel = document.activeElement.closest('.expertise-carousel');
+                if (!inCarousel && document.activeElement.tagName !== 'BODY') return;
+                if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
+                if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
+            });
+
+            // Touch/swipe support
+            let touchStartX = 0;
+            grid.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+            grid.addEventListener('touchend', e => {
+                const diff = touchStartX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
+            });
+
+            // Recalculate on resize
+            window.addEventListener('resize', updateCarousel);
+
+            // Initial render (slight delay to ensure layout is ready)
+            setTimeout(updateCarousel, 50);
+        })();
+
+        /* =====================================================================
+           SKIP VIDEO LOADING ON MOBILE (saves bandwidth & battery)
+           ===================================================================== */
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.section-bg video').forEach(v => {
+                v.removeAttribute('autoplay');
+                v.pause();
+            });
+        }
     </script>
     
     <script src="../js/lang-switch.js"></script>
