@@ -33,7 +33,7 @@
            2. BACKGROUND SYSTEM (Per-Section Video Backgrounds)
            ========================================================================== */
 
-        /* Container that holds all section background videos, fixed behind everything */
+        /* Single video background — always visible behind everything */
         #section-bg-container {
             position: fixed;
             top: 0;
@@ -45,62 +45,22 @@
             overflow: hidden;
         }
 
-        /* Each section's background layer: invisible by default, fades in when active */
         .section-bg {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            opacity: 0;
-            transition: opacity 0.8s ease;
+            inset: 0;
         }
 
-        /* The active section's background becomes visible */
-        .section-bg.active {
-            opacity: 1;
-        }
-
-        /* Video fills the entire background layer */
         .section-bg video {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Optional tint overlay per section — adjust rgba to taste */
+        /* Subtle dark tint over the video so text on the home section remains legible */
         .section-bg::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.35);
-            pointer-events: none;
-        }
-
-        /* #expertise and #about have lighter white tint */
-        #bg-expertise::after,
-        #bg-about::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0);
-            pointer-events: none;
-        }
-
-        /* #roadmap keeps the dark tint for glass card legibility */
-        #bg-roadmap::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.45);
-            pointer-events: none;
-        }
-
-        /* #contact keeps the dark tint like #home */
-        #bg-contact::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background: rgba(0, 0, 0, 0.35);
             pointer-events: none;
         }
@@ -265,6 +225,30 @@
         #roadmap { background: transparent; }
         #contact { background: transparent; }
 
+        /* Non-home sections: give the section itself room for the box margins */
+        #expertise,
+        #about,
+        #roadmap,
+        #contact {
+            padding: 3rem 3rem;   /* space between viewport edge and the box */
+        }
+
+        /* The rounded box that wraps each non-home section's content */
+        .section-box {
+            width: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 55, 100, 0.85) 0%,
+                rgba(0, 20, 45, 0.90) 100%
+            );
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            padding: 4rem;
+            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.45);
+        }
+
         .section-content {
             max-width: 1200px;
             width: 100%;
@@ -401,7 +385,7 @@
         .expertise-card {
             perspective: 1200px;
             min-height: 510px;
-            flex: 0 0 calc(50.4% - 1rem);
+            flex: 0 0 calc(60.9% - 1rem);
             cursor: pointer;
             font-size: 1.35rem;
             color: #1a1a1a;
@@ -733,22 +717,17 @@
             margin-top: 3rem;
         }
 
-        /* #expertise and #about: white text on all screen sizes */
+        /* All sections have a dark background — white text everywhere */
+        #home .section-content h1,
+        #home .section-content p,
+        #home .section-content .subtitle,
         #expertise .section-content h2,
         #expertise .section-content p,
         #about .section-content h2,
         #about .section-content h3,
-        #about .section-content p {
-            color: #ffffff;
-        }
-
-        /* Expertise cards always have dark text (white card background) */
-        #expertise .section-content .card-front h3,
-        #expertise .section-content .card-front p {
-            color: #1a1a1a;
-        }
-
-        /* #contact: white text over dark video tint */
+        #about .section-content p,
+        #roadmap .section-content h2,
+        #roadmap .section-content p,
         #contact .section-content h2,
         #contact .section-content p {
             color: #ffffff;
@@ -757,6 +736,18 @@
         #contact label {
             color: #ffffff;
         }
+
+        /* Expertise cards have white card backgrounds — keep dark text inside them */
+        #expertise .section-content .card-front h3,
+        #expertise .section-content .card-front p {
+            color: #1a1a1a;
+        }
+
+        /* Roadmap panel front face has a white background — restore dark text */
+        #roadmap .panel-front .panel-step-title { color: #1a1a1a; }
+        #roadmap .panel-front .panel-strategy   { color: #666666; }
+        #roadmap .panel-front .panel-step-num   { color: #0066cc; }
+        #roadmap .panel-front .panel-flip-hint  { color: #0066cc; }
 
         /* ==========================================================================
            7. RESPONSIVE DESIGN
@@ -890,7 +881,7 @@
 
             /* On mobile, active card takes up more width */
             .expertise-card {
-                flex: 0 0 82%;
+                flex: 0 0 99%;
                 min-height: 375px;
             }
 
@@ -1000,7 +991,7 @@
         /* Outer wrapper: perspective container, fixed size */
         .roadmap-panel {
             perspective: 1200px;
-            height: 480px;
+            height: 440px;
             cursor: pointer;
         }
 
@@ -1299,30 +1290,11 @@
          Each .section-bg corresponds to one page section.
          Set your MP4 filenames in the VIDEO CONFIGURATION script below.
          ===================================================================== -->
+    <!-- Single video background — plays behind all sections -->
     <div id="section-bg-container">
         <div class="section-bg active" id="bg-home">
             <video autoplay loop muted playsinline id="home-bg-video">
                 <source id="home-video-source" type="video/mp4">
-            </video>
-        </div>
-        <div class="section-bg" id="bg-expertise">
-            <video autoplay loop muted playsinline id="expertise-bg-video">
-                <source id="expertise-video-source" type="video/mp4">
-            </video>
-        </div>
-        <div class="section-bg" id="bg-about">
-            <video autoplay loop muted playsinline id="about-bg-video">
-                <source id="about-video-source" type="video/mp4">
-            </video>
-        </div>
-        <div class="section-bg" id="bg-contact">
-            <video autoplay loop muted playsinline id="contact-bg-video">
-                <source id="contact-video-source" type="video/mp4">
-            </video>
-        </div>
-        <div class="section-bg" id="bg-roadmap">
-            <video autoplay loop muted playsinline id="roadmap-bg-video">
-                <source id="roadmap-video-source" type="video/mp4">
             </video>
         </div>
     </div>
@@ -1380,7 +1352,7 @@
         </section>
 
         <section id="about">
-            <div class="section-content">
+            <div class="section-content section-box">
                 <h2>
                     About Us
                 </h2>
@@ -1424,7 +1396,7 @@
         </section>
 
         <section id="expertise">
-            <div class="section-content">
+            <div class="section-content section-box">
                 <h2>
                     Our Expertise
                     <!-- What we offer -->
@@ -1634,7 +1606,7 @@
         </section>
 
         <section id="roadmap">
-            <div class="section-content">
+            <div class="section-content section-box">
                 <h2>From Data to Direction: Our 4-Step Roadmap</h2>
                 <!-- <p>Click an icon or use the arrows to explore each step of our process.</p> -->
 
@@ -1736,10 +1708,7 @@
                                         <span class="panel-step-title">Diagnose</span>
                                     </div>
                                 </div>
-                                <p class="panel-strategy">
-                                    We develop a comprehensive understanding of your organization's financial health, operational structure, and risk profile.<br>
-                                    Through structured analysis and leadership discussions, we pinpoint inefficiencies, hidden exposures, and high-impact opportunities.
-                                </p>
+                                <p class="panel-strategy">We develop a comprehensive understanding of your organization's financial health, operational structure, and risk profile. Through structured analysis and leadership discussions, we pinpoint inefficiencies, hidden exposures, and high-impact opportunities.</p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
@@ -1769,10 +1738,7 @@
                                         <span class="panel-step-title">Model</span>
                                     </div>
                                 </div>
-                                <p class="panel-strategy">
-                                    Leveraging advanced analytics and actuarial-grade forecasting, we simulate various scenarios and project future outcomes.<br>
-                                    We move beyond static budgets to help you visualize how today's decisions will impact tomorrow's results.
-                                </p>
+                                <p class="panel-strategy">Leveraging advanced analytics and actuarial-grade forecasting, we simulate various scenarios and project future outcomes. We move beyond static budgets to help you visualize how today's decisions will impact tomorrow's results.</p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
@@ -1802,10 +1768,7 @@
                                         <span class="panel-step-title">Implement</span>
                                     </div>
                                 </div>
-                                <p class="panel-strategy">
-                                    Insight without action is a lost opportunity.<br>
-                                    We partner closely with your management team to deploy practical, high-impact solutions that modernize financial management, streamline operations, and sharpen decision-making at every level.
-                                </p>
+                                <p class="panel-strategy">Insight without action is a lost opportunity. We partner closely with your management team to deploy practical, high-impact solutions that modernize financial management, streamline operations, and sharpen decision-making at every level.</p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
@@ -1835,10 +1798,7 @@
                                         <span class="panel-step-title">Monitor</span>
                                     </div>
                                 </div>
-                                <p class="panel-strategy">
-                                    High-performing organizations never stop evolving.<br>
-                                    We establish the governance frameworks and monitoring tools necessary for management to track real-time performance, identify emerging risks early, and pivot strategies before challenges become crises.
-                                </p>
+                                <p class="panel-strategy">High-performing organizations never stop evolving. We establish the governance frameworks and monitoring tools necessary for management to track real-time performance, identify emerging risks early, and pivot strategies before challenges become crises.</p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
@@ -1874,7 +1834,7 @@
         </section>
 
                         <section id="contact">
-            <div class="section-content">
+            <div class="section-content section-box">
                 <h2>Let's change the game together</h2>
                 <p>Like what you have seen? Let's get started.</p>
                 
@@ -1911,11 +1871,7 @@
         const media_folder_path = '../media';
 
         const sectionVideos = {
-            home:      'Sample_5.mp4',
-            expertise: 'Sample_5.mp4',
-            about:     'Sample_5.mp4',
-            roadmap:   'Sample_5.mp4',
-            contact:   'Sample_5.mp4',
+            home: 'Sample_5.mp4',
         };
 
         // Inject src attributes into each video source element
@@ -1962,9 +1918,7 @@
         }); */
 
         /* =====================================================================
-           ACTIVE SECTION TRACKING
-           Crossfades between section background videos as user scrolls.
-           Also updates navigation active state.
+           ACTIVE SECTION TRACKING — updates nav highlight as user scrolls
            ===================================================================== */
         const observerOptions = {
             root: null,
@@ -1975,21 +1929,15 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const targetId = entry.target.id;
-
-                    // Update nav active state
                     navWidgets.forEach(widget => {
                         widget.classList.toggle('active', widget.getAttribute('data-target') === targetId);
                     });
-
-                    // Crossfade section backgrounds
-                    document.querySelectorAll('.section-bg').forEach(bg => {
-                        bg.classList.remove('active');
-                    });
-                    const activeBg = document.getElementById(`bg-${targetId}`);
-                    if (activeBg) activeBg.classList.add('active');
                 }
             });
         }, observerOptions);
+
+        // Register all sections with the observer
+        sections.forEach(section => observer.observe(section));
 
         /* =====================================================================
            HAMBURGER MENU
