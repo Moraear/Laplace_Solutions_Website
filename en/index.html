@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laplace Solutions</title>
+    <title>Laplace Solutions | Pricing, forecasting & data software for SMBs</title>
+    <meta name="description" content="Actuarial analysis and software development for small and medium-sized businesses in Quebec. Pricing, forecasting, KPIs, automation and cloud cost control.">
     <link rel="icon" type="image/x-icon" href="../media/Logo.ico">
     <style>
         /* ==========================================================================
@@ -229,6 +230,7 @@
         /* Non-home sections: give the section itself room for the box margins */
         #expertise,
         #about,
+        #projects,
         #roadmap,
         #contact {
             padding: 3rem 3rem;   /* space between viewport edge and the box */
@@ -729,6 +731,10 @@
         #about .section-content p,
         #roadmap .section-content h2,
         #roadmap .section-content p,
+        #projects .section-content h2,
+        #projects .section-content h3,
+        #projects .section-content p,
+        #expertise .also-available h3,
         #contact .section-content h2,
         #contact .section-content p {
             color: #ffffff;
@@ -1283,6 +1289,142 @@
             }
         }
 
+        /* ==========================================================================
+           9. PROJECTS & SECONDARY SERVICE
+           ========================================================================== */
+        #projects { background: transparent; }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .project {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-top: 3px solid #0066cc;
+            border-radius: 8px;
+            padding: 1.75rem;
+        }
+
+        .project h3 {
+            font-size: 1.1rem;
+            line-height: 1.35;
+            margin: 0 0 0.9rem;
+        }
+
+        #projects .project p {
+            font-size: 0.92rem;
+            line-height: 1.65;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 0.8rem;
+        }
+
+        #projects .project .project-stat {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .project-stat strong {
+            display: block;
+            font-size: 2.4rem;
+            line-height: 1.1;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .project ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .project ul li {
+            font-size: 0.88rem;
+            line-height: 1.55;
+            color: rgba(255, 255, 255, 0.85);
+            padding-left: 1rem;
+            position: relative;
+            margin-bottom: 0.45rem;
+        }
+
+        .project ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.6em;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #4da3ff;
+        }
+
+        .also-available {
+            margin-top: 2.5rem;
+            padding-top: 1.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .also-available h3 {
+            font-size: 1.1rem;
+            margin-top: 0;
+        }
+
+        #expertise .also-available p {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0;
+        }
+
+        .expertise-card .icon svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        @media (max-width: 960px) {
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Mobile: give content the full width (desktop box padding squeezed text into a narrow column) */
+        @media (max-width: 768px) {
+            #expertise,
+            #about,
+            #projects,
+            #roadmap,
+            #contact {
+                padding: 2rem 0.75rem;
+            }
+
+            .section-box {
+                padding: 2rem 1.25rem;
+                border-radius: 14px;
+            }
+
+            .expertise-carousel {
+                gap: 0.4rem;
+                margin-top: 1.5rem;
+            }
+
+            .carousel-arrow {
+                width: 32px;
+                height: 32px;
+            }
+
+            .card-face {
+                padding: 1.5rem;
+            }
+
+            .expertise-card,
+            .card-inner {
+                min-height: 440px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -1306,10 +1448,11 @@
         </div>
         <div class="header-middle">
             <nav>
+                <div class="nav-widget" data-target="expertise">SERVICES</div>
+                <div class="nav-widget" data-target="projects">PROJECTS</div>
+                <div class="nav-widget" data-target="roadmap">HOW WE WORK</div>
                 <div class="nav-widget" data-target="about">ABOUT US</div>
-                <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
-                <div class="nav-widget" data-target="roadmap">OUR APPROACH</div>
-                <div class="nav-widget" data-target="contact">CONTACT US</div>
+                <div class="nav-widget" data-target="contact">CONTACT</div>
             </nav>
         </div>
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">
@@ -1321,92 +1464,31 @@
     </header>
 
     <main id="main-content">
-        
+
         <section id="home">
             <div class="section-content">
                 <h1 style="color: #ffffff;">
                     <strong>
-                        Data Driven Strategy.<br>
-                        Scalable Technology.<br>
-                        <!-- CFO Services. -->
-                        <!-- CFO-Level Strategy. Scalable Tech. -->
-                        <!-- Smarter Pricing. Stronger Margins. -->
+                        Rigorous models,<br>
+                        and the software to run them.
                     </strong>
                 </h1>
                 <p class="subtitle" style="color: #ffffff;">
-                    We help you unlock the full potential of your profit by providing the strategic oversight your growth demands. <br>
-                    From cleaning up the books to building your future blueprint, we’re here to ensure your finances fuel your vision.<br><br>
-                    The CFO your business deserves, at the scale you need.
-                    <!-- Most companies don’t fail from a lack of revenue, they fail from poor cash flow management.<br>
-                    We build the financial infrastructure and provide the leadership you need to scale.<br> -->
-                    <!-- Get strategic clarity backed by systems that never miss a beat. -->
-                    <!-- We combine CFO‑level advisory with integrated technology to streamline your core accounting.<br>
-                    Get strategic clarity backed by systems that never miss a beat. -->
-                    <!-- We optimize pricing, deliver real‑time performance visibility, and automate operations.<br>
-                    Grow your margins, not your overhead. -->
+                    Laplace Solutions brings actuarial analysis and software development to small and medium-sized businesses.
+                    We build the pricing, forecasting and KPI models you make decisions with, then turn them into tools your team uses every day.
                 </p>
                 <div class="cta-buttons">
-                    <a href="#expertise" class="button_3">Learn More</a>
-                    <a href="#contact" class="button_3">Schedule a Consultation</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="about">
-            <div class="section-content section-box">
-                <h2>
-                    About Us
-                </h2>
-                
-                <div class="about-block">
-                    <h3>
-                        Who We Are
-                    </h3>
-                    <p>
-                        We are a team of seasoned actuaries with decades of experience navigating high‑stakes financial environments.
-                        From pension risk to insurance analytics, we’ve spent our careers in industries where the margin for error is zero.
-                    </p>
-                </div>
-        
-                <div class="about-block">
-                    <h3>
-                        Our Mission
-                    </h3>
-                    <p>
-                        Our mission is to help organizations build resilient, well-governed businesses by transforming data and uncertainty into clear strategies. 
-                        Through actuarial rigor and forward-looking analysis, we design the processes and technology needed to ensure long-term financial health and sustainable growth.
-                        <!-- We replace guesswork with systems, ensuring every strategic move supports long‑term profitability. -->
-                        <!-- Our mission is to take the sophisticated modeling and risk‑management disciplines of the actuarial world and apply them to growth‑oriented companies. -->
-                    </p>
-                </div>
-        
-                <div class="about-block">
-                    <h3>
-                        Why Actuaries?
-                    </h3>
-                    <p>
-                        Actuaries possess a unique mastery over uncertainty and modelling the future.
-                        We bring this forward-looking expertise directly to your business decision-making in order to help you anticipate challenges, evaluate opportunities, and build resilient long-term plans.
-                        Guided by the rigorous ethical standards of our profession, we provide the objective advice necessary for your sustainable success.
-                        <!-- Actuaries don't just report on the past; we model the future. -->
-                        <!-- While most analysts look at what happened last quarter, we examine the underlying structural mechanics of your business. -->
-                        <!-- We strip away the noise and isolate the variables that distinguish success from failure. -->
-                    </p>
+                    <a href="#contact" class="button_3">Book a free discovery call</a>
+                    <a href="#projects" class="button_3">See what we've built</a>
                 </div>
             </div>
         </section>
 
         <section id="expertise">
             <div class="section-content section-box">
-                <h2>
-                    Our Expertise
-                    <!-- What we offer -->
-                </h2>
+                <h2>Where we can help</h2>
                 <p>
-                    We perform an audit on your systems and financial operations to find the leakage.<br>
-                    We build the infrastructure for profitable growth through three core pillars:
-                    <!-- Data is only as valuable as the decisions it drives.<br> -->
-                    <!-- We implement the systems your margins need to thrive through three tactical pillars: -->
+                    Five kinds of work, one method. Click a card to see what each one includes.
                 </p>
 
                 <div class="expertise-carousel">
@@ -1424,31 +1506,26 @@
                                     <div class="card-face card-front">
                                         <div class="expertise-header">
                                             <div class="expertise-header-left">
-                                                <div class="icon">🎯</div>
+                                                <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg></div>
                                             </div>
                                             <div class="expertise-header-right">
-                                                <h3>Fractional CFO &<br> Strategic Leadership</h3>
+                                                <h3>Pricing &amp; Profitability</h3>
                                             </div>
                                         </div>
                                         <p>
-                                            Our Fractional CFO services deliver high-impact financial leadership and executive-level oversight without the overhead of a full-time hire.<br><br>
-                                            We partner closely with your leadership team to sharpen financial governance, facilitate data-driven decision-making, and secure the long-term stability of your organization.
+                                            Know what each product, contract or customer actually earns you.<br><br>We build pricing models from your own data, test them against what really happened, and show where margin is being lost.
                                         </p>
                                         <span class="flip-hint">Details</span>
                                     </div>
                                     <div class="card-face card-back">
-                                        <h3>Key Services</h3>
+                                        <h3>What we do</h3>
                                         <ul>
-                                            <li>Dynamic cash flow forecasting and proactive liquidity planning.</li>
-                                            <li>Strategic budget development and integrated financial planning.</li>
-                                            <li>Custom KPI architecture and real-time performance monitoring.</li>
-                                            <li>High-level decision support for executive leadership teams.</li>
-                                            <li>Advanced scenario analysis and long-range financial projections.</li>
-                                            <li>Sophisticated reporting for Boards and investors.</li>
-                                            <li>Comprehensive risk identification and mitigation planning.</li>
-                                            <li>Deep-dive profitability analysis and strategic cost optimization.</li>
+                                            <li>Pricing models built from your sales, cost and claims history.</li>
+                                            <li>Profitability by product, customer, contract or channel.</li>
+                                            <li>Testing a price change before it goes live: who stays, who leaves, what happens to margin.</li>
+                                            <li>Review of an existing pricing model or rate structure.</li>
                                         </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Robust financial governance, empowered decision-making, and a definitive long-term strategy.</div>
+                                        <div class="card-outcome"><strong>What you get</strong>Prices you can explain and defend, and a clear view of where margin goes.</div>
                                         <p class="back-hint">Click to flip back</p>
                                     </div>
                                 </div>
@@ -1459,31 +1536,26 @@
                                     <div class="card-face card-front">
                                         <div class="expertise-header">
                                             <div class="expertise-header-left">
-                                                <div class="icon">📋</div>
+                                                <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="15 7 21 7 21 13"/></svg></div>
                                             </div>
                                             <div class="expertise-header-right">
-                                                <h3>Accounting Oversight & Reporting</h3>
+                                                <h3>Forecasting &amp; Reserving</h3>
                                             </div>
                                         </div>
                                         <p>
-                                            We fortify your accounting operations by optimizing internal processes, verifying financial integrity, and mentoring internal teams.<br><br>
-                                            Our goal is to instill total transparency and ensure that every report is accurate, timely, and a true reflection of your business health.
+                                            Plan for a range of outcomes.<br><br>We forecast sales, costs, cash and future obligations, and model what happens under several scenarios, so a bad quarter is a scenario you already looked at.
                                         </p>
                                         <span class="flip-hint">Details</span>
                                     </div>
                                     <div class="card-face card-back">
-                                        <h3>Key Services</h3>
+                                        <h3>What we do</h3>
                                         <ul>
-                                            <li>Executive review and oversight of month-end closing processes.</li>
-                                            <li>Rigorous account reconciliation and reporting validation.</li>
-                                            <li>Continuous optimization of accounting workflows.</li>
-                                            <li>Design and documentation of robust internal controls.</li>
-                                            <li>Expert coordination of year-end reporting with external auditors.</li>
-                                            <li>Detailed financial statement analysis and quality reviews.</li>
-                                            <li>Implementation of accounting system and software improvements.</li>
-                                            <li>Strategic support and training for finance and accounting staff.</li>
+                                            <li>Sales, cost and cash flow forecasts.</li>
+                                            <li>Scenario and sensitivity analysis.</li>
+                                            <li>Reserves and provisions for future obligations such as claims, warranties or returns.</li>
+                                            <li>Budget models your team can update on its own.</li>
                                         </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Reliable, audit-ready reporting, strengthened internal controls, and a high-efficiency accounting function.</div>
+                                        <div class="card-outcome"><strong>What you get</strong>Plans built on a range of outcomes, with every assumption written down.</div>
                                         <p class="back-hint">Click to flip back</p>
                                     </div>
                                 </div>
@@ -1494,30 +1566,26 @@
                                     <div class="card-face card-front">
                                         <div class="expertise-header">
                                             <div class="expertise-header-left">
-                                                <div class="icon">🤝</div>
+                                                <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="8" y1="17" x2="8" y2="11"/><line x1="12" y1="17" x2="12" y2="7"/><line x1="16" y1="17" x2="16" y2="13"/></svg></div>
                                             </div>
                                             <div class="expertise-header-right">
-                                                <h3>Mergers & Acquisitions Advisory</h3>
+                                                <h3>Data, KPIs &amp; Monitoring</h3>
                                             </div>
                                         </div>
                                         <p>
-                                            We guide businesses through every stage of the M&A lifecycle, ensuring that growth through acquisition is both strategic and sustainable.<br><br>
-                                            Our firm provides the analytical depth required to evaluate opportunities, structure complex transactions, and seamlessly integrate operations to capture long-term value.
+                                            Pick the handful of KPIs that matter, then stop building them by hand.<br><br>We connect your systems and deliver dashboards that update themselves.
                                         </p>
                                         <span class="flip-hint">Details</span>
                                     </div>
                                     <div class="card-face card-back">
-                                        <h3>Key Services</h3>
+                                        <h3>What we do</h3>
                                         <ul>
-                                            <li>Targeted acquisition evaluation and rigorous financial analysis.</li>
-                                            <li>Comprehensive due diligence support and risk assessment.</li>
-                                            <li>Advanced financial modeling and precision valuation analysis.</li>
-                                            <li>Strategic transaction structuring and deal-side negotiation strategy.</li>
-                                            <li>Capital planning and financing strategy optimization.</li>
-                                            <li>Post-merger integration planning and operational alignment.</li>
-                                            <li>Performance monitoring and synergy realization tracking.</li>
+                                            <li>KPI selection and definitions agreed with management.</li>
+                                            <li>Data connections to your ERP, CRM, sales and operations systems.</li>
+                                            <li>Automated dashboards and reports.</li>
+                                            <li>Performance metrics for teams and individuals.</li>
                                         </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Highly informed investment decisions and seamless transaction execution.</div>
+                                        <div class="card-outcome"><strong>What you get</strong>Current numbers every morning, without anyone compiling them.</div>
                                         <p class="back-hint">Click to flip back</p>
                                     </div>
                                 </div>
@@ -1528,30 +1596,26 @@
                                     <div class="card-face card-front">
                                         <div class="expertise-header">
                                             <div class="expertise-header-left">
-                                                <div class="icon">⚙️</div>
+                                                <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
                                             </div>
                                             <div class="expertise-header-right">
-                                                <h3>Systems, Data & Automation</h3>
+                                                <h3>Custom Software &amp; Automation</h3>
                                             </div>
                                         </div>
                                         <p>
-                                            We empower organizations to modernize their financial and operational infrastructure through intelligent technology integration.<br><br>
-                                            By refining data architecture and deploying advanced analytical tools, we transform fragmented information into a unified engine for superior decision-making.
+                                            Replace the fragile spreadsheet that only one person understands.<br><br>We design and build applications that process your data, apply your business rules and produce the outputs your team needs.
                                         </p>
                                         <span class="flip-hint">Details</span>
                                     </div>
                                     <div class="card-face card-back">
-                                        <h3>Key Services</h3>
+                                        <h3>What we do</h3>
                                         <ul>
-                                            <li>Strategic ERP and CRM system implementation and oversight.</li>
-                                            <li>Financial data architecture design and robust governance.</li>
-                                            <li>End-to-end process automation and workflow optimization.</li>
-                                            <li>Unified data consolidation and executive reporting frameworks.</li>
-                                            <li>Development of bespoke analytics models and forecasting tools.</li>
-                                            <li>Interactive Business Intelligence (BI) dashboards and real-time reporting.</li>
-                                            <li>Seamless integration between operational and accounting ecosystems.</li>
+                                            <li>Applications and databases built around your process.</li>
+                                            <li>Critical spreadsheets rebuilt as maintained tools.</li>
+                                            <li>Automated data cleaning, validation and anomaly detection.</li>
+                                            <li>Integration between the systems you already use.</li>
                                         </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Unmatched operational efficiency, superior data integrity, and total visibility into business performance.</div>
+                                        <div class="card-outcome"><strong>What you get</strong>Repetitive work runs on its own, and errors get caught before they reach a report.</div>
                                         <p class="back-hint">Click to flip back</p>
                                     </div>
                                 </div>
@@ -1562,30 +1626,26 @@
                                     <div class="card-face card-front">
                                         <div class="expertise-header">
                                             <div class="expertise-header-left">
-                                                <div class="icon">🔄</div>
+                                                <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 10h-1.3A7 7 0 1 0 9 19h9a4.5 4.5 0 0 0 0-9z"/></svg></div>
                                             </div>
                                             <div class="expertise-header-right">
-                                                <h3>Restructuring &<br> Business Turnaround</h3>
+                                                <h3>Cloud Costs (FinOps)</h3>
                                             </div>
                                         </div>
                                         <p>
-                                            When organizations face critical operational or liquidity challenges, we provide the structured leadership necessary to stabilize the foundation and restore long-term viability.<br><br>
-                                            We act as a steady hand, transforming financial distress into a disciplined, data-backed recovery strategy that protects value and secures the future.
+                                            Find out why your cloud bill keeps growing and what to do about it.<br><br>We audit usage, tag spend to teams and products, and set up the reporting that keeps it under control.
                                         </p>
                                         <span class="flip-hint">Details</span>
                                     </div>
                                     <div class="card-face card-back">
-                                        <h3>Key Services</h3>
+                                        <h3>What we do</h3>
                                         <ul>
-                                            <li>Deep-dive financial diagnostics and performance stress testing.</li>
-                                            <li>Immediate cash flow stabilization and strategic liquidity planning.</li>
-                                            <li>Debt restructuring and professional lead-negotiator support for lenders.</li>
-                                            <li>Aggressive cost-reduction strategies and operational efficiency initiatives.</li>
-                                            <li>Comprehensive turnaround strategy development and execution.</li>
-                                            <li>Transparent communication management for stakeholders and creditors.</li>
-                                            <li>Rigorous monitoring and hands-on implementation of recovery plans.</li>
+                                            <li>Audit of cloud usage and spend.</li>
+                                            <li>Cost allocation by team, product or client.</li>
+                                            <li>Right-sizing and commitment recommendations.</li>
+                                            <li>Budget alerts and monthly cost reporting.</li>
                                         </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Restored financial stability, instilled operational discipline, and a definitive roadmap toward sustainable recovery.</div>
+                                        <div class="card-outcome"><strong>What you get</strong>A cloud bill you understand and can forecast.</div>
                                         <p class="back-hint">Click to flip back</p>
                                     </div>
                                 </div>
@@ -1603,13 +1663,65 @@
 
                 <div class="carousel-dots" id="carousel-dots"></div>
 
+                <div class="also-available">
+                    <h3>Also available: Fractional CFO &amp; accounting oversight</h3>
+                    <p>
+                        For companies without a full-time finance lead, we provide part-time financial oversight:
+                        month-end review, budgeting, and reporting for owners, boards and lenders.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects">
+            <div class="section-content section-box">
+                <h2>Recent work</h2>
+                <p>We keep client names private. Here is what the work did for them.</p>
+
+                <div class="projects-grid">
+                    <article class="project">
+                        <p class="project-stat"><strong>90%</strong> less manual review</p>
+                        <h3>Road data collection and management software for municipalities</h3>
+                        <p>
+                            For an engineering firm, we built an application and database that process road survey data,
+                            flag anomalies and correct them automatically, then summarize the results and recommend interventions.
+                        </p>
+                        <ul>
+                            <li>Survey data matched across systems by location and time, automatically</li>
+                            <li>Fewer errors in field-collected data and post-processing</li>
+                            <li>Settings adjustable to each municipality's road network and priorities</li>
+                        </ul>
+                    </article>
+
+                    <article class="project">
+                        <p class="project-stat"><strong>Live</strong> sales visibility</p>
+                        <h3>A sales dashboard for a distributor and manufacturer</h3>
+                        <p>
+                            Built this year. Management sees at a glance which products sell best and worst,
+                            which customers have stopped reordering a product, and which backorders to handle first based on their age and size.
+                        </p>
+                        <p>
+                            The sales team uses the reorder list to call those customers for feedback and to win the sale back.
+                        </p>
+                    </article>
+
+                    <article class="project">
+                        <p class="project-stat"><strong>&#8531;</strong> smaller performance gap</p>
+                        <h3>Call center performance tracking</h3>
+                        <p>
+                            We designed a set of metrics for comparing advisors, including closing ratio and handling time, and built the tools to track them.
+                        </p>
+                        <p>
+                            Managers used them to give each advisor specific feedback. Over six months, the gap between the best and worst performer narrowed by about a third.
+                        </p>
+                    </article>
+                </div>
             </div>
         </section>
 
         <section id="roadmap">
             <div class="section-content section-box">
-                <h2>From Data to Direction: Our 4-Step Roadmap</h2>
-                <!-- <p>Click an icon or use the arrows to explore each step of our process.</p> -->
+                <h2>From your data to a working tool, in four steps</h2>
 
                 <div class="roadmap-layout">
 
@@ -1710,22 +1822,19 @@
                                     </div>
                                 </div>
                                 <p class="panel-strategy">
-                                    We develop a comprehensive understanding of your organization's financial health, operational structure, and risk profile.<br><br>
-                                    Through structured analysis and leadership discussions, we pinpoint inefficiencies, hidden exposures, and high-impact opportunities.
+                                    We look at your data, systems and current process, and agree on the decisions you need help with.<br><br>You get a short written assessment and a scoped proposal.
                                 </p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
+                                <p class="panel-section-label">Typical activities</p>
                                 <ul class="panel-activities">
-                                    <li>Comprehensive review of financial statements and operational data.</li>
-                                    <li>Deep-dive analysis of cash flow patterns and liquidity risks.</li>
-                                    <li>Assessment of accounting processes and reporting structures.</li>
-                                    <li>Evaluation of existing systems and data integrity.</li>
-                                    <li>Identification of operational bottlenecks and risk exposures.</li>
-                                    <li>Performance benchmarking against key industry metrics.</li>
+                                    <li>Conversations with management about the decisions that matter.</li>
+                                    <li>Review of your data sources, systems and current reports.</li>
+                                    <li>Data quality check.</li>
+                                    <li>Written assessment and scoped proposal.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>A definitive diagnostic of your current financial health and a prioritized roadmap for improvement.</div>
+                                <div class="panel-outcome"><strong>What you get</strong>A written scope and estimate before any build starts.</div>
                                 <p class="panel-back-hint">Click to flip back</p>
                             </div>
                         </div>
@@ -1743,22 +1852,19 @@
                                     </div>
                                 </div>
                                 <p class="panel-strategy">
-                                    Leveraging advanced analytics and actuarial-grade forecasting, we simulate various scenarios and project future outcomes.<br><br>
-                                    We move beyond static budgets to help you visualize how today's decisions will impact tomorrow's results.
+                                    We build the analysis: pricing, forecasts, scenarios or KPI definitions.<br><br>Every assumption is written down and tested against your history.
                                 </p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
+                                <p class="panel-section-label">Typical activities</p>
                                 <ul class="panel-activities">
-                                    <li>Dynamic cash flow forecasting and long-term financial projections.</li>
-                                    <li>Advanced scenario modeling and sensitivity analysis.</li>
-                                    <li>Risk quantification and rigorous stress testing.</li>
-                                    <li>Development of customized financial planning and budgeting models.</li>
-                                    <li>Strategic capital and liquidity planning.</li>
-                                    <li>Decision-support modeling for major investments or acquisitions.</li>
+                                    <li>Pricing, forecasting, reserving or KPI models.</li>
+                                    <li>Scenario and sensitivity analysis.</li>
+                                    <li>Back-testing against your own history.</li>
+                                    <li>Documented assumptions you can question.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>A forward-looking perspective on risks and rewards that empowers confident strategic planning.</div>
+                                <div class="panel-outcome"><strong>What you get</strong>A model you understand, with every assumption on paper.</div>
                                 <p class="panel-back-hint">Click to flip back</p>
                             </div>
                         </div>
@@ -1776,22 +1882,19 @@
                                     </div>
                                 </div>
                                 <p class="panel-strategy">
-                                    Insight without action is a lost opportunity.<br><br>
-                                    We partner closely with your management team to deploy practical, high-impact solutions that modernize financial management, streamline operations, and sharpen decision-making at every level.
+                                    We turn the model into something your team uses: an application, an automated pipeline or a dashboard, connected to your systems.
                                 </p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
+                                <p class="panel-section-label">Typical activities</p>
                                 <ul class="panel-activities">
-                                    <li>Modernization of accounting workflows and reporting standards.</li>
-                                    <li>Development of intuitive KPI dashboards and performance monitoring tools.</li>
-                                    <li>Strategic deployment of ERP, CRM, and advanced reporting systems.</li>
-                                    <li>Automation of manual financial workflows and data processing.</li>
-                                    <li>Hands-on support for organizational restructuring or strategic pivots.</li>
-                                    <li>Direct coordination with external auditors, advisors, and financial institutions.</li>
+                                    <li>Applications, databases and automated data pipelines.</li>
+                                    <li>Dashboards connected to your systems.</li>
+                                    <li>Testing with the people who will use the tool.</li>
+                                    <li>Documentation and handover.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>Tangible operational improvements that reinforce your financial foundation and organizational efficiency.</div>
+                                <div class="panel-outcome"><strong>What you get</strong>A tool your team uses every week.</div>
                                 <p class="panel-back-hint">Click to flip back</p>
                             </div>
                         </div>
@@ -1809,21 +1912,19 @@
                                     </div>
                                 </div>
                                 <p class="panel-strategy">
-                                    High-performing organizations never stop evolving.<br><br>
-                                    We establish the governance frameworks and monitoring tools necessary for management to track real-time performance, identify emerging risks early, and pivot strategies before challenges become crises.
+                                    We track how the model performs against reality and adjust it as your business changes.
                                 </p>
                                 <span class="panel-flip-hint">Activities</span>
                             </div>
                             <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
+                                <p class="panel-section-label">Typical activities</p>
                                 <ul class="panel-activities">
-                                    <li>Continuous KPI tracking and executive performance reporting.</li>
-                                    <li>Real-time cash flow and liquidity monitoring.</li>
-                                    <li>Implementation of comprehensive risk-monitoring frameworks.</li>
-                                    <li>Facilitation of periodic financial and strategic reviews with leadership.</li>
-                                    <li>Ongoing strategic planning updates and tactical adjustments.</li>
+                                    <li>Comparing model results with actuals.</li>
+                                    <li>Recalibration when your business or market changes.</li>
+                                    <li>Alerts when a KPI drifts.</li>
+                                    <li>Periodic reviews with management.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>Enhanced visibility, robust governance, and a culture of proactive risk management.</div>
+                                <div class="panel-outcome"><strong>What you get</strong>Models that stay accurate after the project ends.</div>
                                 <p class="panel-back-hint">Click to flip back</p>
                             </div>
                         </div>
@@ -1846,29 +1947,65 @@
             </div>
         </section>
 
-                        <section id="contact">
+        <section id="about">
             <div class="section-content section-box">
-                <h2>Let's change the game together</h2>
-                <p>Like what you have seen? Let's get started.</p>
-                
+                <h2>A small team that does the work itself</h2>
+
+                <div class="about-block">
+                    <p>
+                        Laplace Solutions is three people: two with day-to-day experience in actuarial pricing and reserving,
+                        and one software developer and architect. Between us we cover the analysis and the build,
+                        so the model and the software that runs it come from the same team.
+                    </p>
+                </div>
+
+                <div class="about-block">
+                    <h3>Why both skills matter</h3>
+                    <p>
+                        An analysis only helps if someone runs it every week, and software only helps if the numbers inside it are right.
+                        We test our models against your history before building anything on top of them,
+                        and we build the tools so your team can keep using them after we leave.
+                    </p>
+                </div>
+
+                <div class="about-block">
+                    <h3>Who you work with</h3>
+                    <p>
+                        You work directly with us from the first call to the final delivery.
+                        We don't hand your project to someone you've never met.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact">
+            <div class="section-content section-box">
+                <h2>Tell us what decision you're stuck on</h2>
+                <p>A 30-minute call is enough to tell whether we can help. If we can't, we'll say so.</p>
+
                 <div class="contact-form">
                     <form action="https://formspree.io/f/xgolevlg" method="POST">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                            <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" autocomplete="email" required>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
+                            <label for="company">Company</label>
+                            <input type="text" id="company" name="company" placeholder="Company name" autocomplete="organization">
                         </div>
-                        
-                        <button type="submit" class="button_3">Send Message</button>
+
+                        <div class="form-group">
+                            <label for="message">What would you like help with?</label>
+                            <textarea id="message" name="message" placeholder="A pricing question, a forecast, a report you build by hand every week..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="button_3">Send my request</button>
                     </form>
                 </div>
             </div>
