@@ -5,2338 +5,1067 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laplace Solutions</title>
     <link rel="icon" type="image/x-icon" href="../media/Logo.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* ==========================================================================
-           1. CORE RESET & BASE STYLES
+           TOKENS & BASE
            ========================================================================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #05080F;
+            --panel: #0B111D;
+            --panel-2: #111A2B;
+            --tab-bar: #080D17;
+            --text: #B4BECC;
+            --text-strong: #D5DCE6;
+            --white: #FFFFFF;
+            --dim: #66758B;
+            --muted: #8792A3;
+            --sky: #33B5EA;
+            --sky-label: #66C7EF;
+            --amber: #F2A93B;
+            --line: rgba(233, 238, 246, 0.08);
+            --line-2: rgba(233, 238, 246, 0.16);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 80px; }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            font-size: 17px;
+            line-height: 1.65;
             overflow-x: hidden;
-            overflow-y: scroll;
-            background: rgb(0, 40, 80);
-            color: #1a1a1a;
-            line-height: 1.6;
-            position: relative;
-            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { color: #E9EEF6; }
+        a:hover { color: var(--white); }
+
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        textarea:focus-visible, summary:focus-visible {
+            outline: 3px solid var(--sky);
+            outline-offset: 3px;
+        }
+
+        h1, h2, h3, h4 { color: var(--white); font-weight: 600; }
+
+        main { overflow-x: clip; }
+
+        .wrap { max-width: 1180px; margin: 0 auto; }
+
+        .section-title {
+            font-size: clamp(32px, 3.8vw, 50px);
+            line-height: 1.12;
+            letter-spacing: -0.025em;
+        }
+
+        .glow {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
         }
 
         /* ==========================================================================
-           2. BACKGROUND SYSTEM (Per-Section Video Backgrounds)
+           HEADER
            ========================================================================== */
-
-        /* Single video background — always visible behind everything */
-        #section-bg-container {
-            position: fixed;
+        .site-header {
+            position: sticky;
             top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
+            z-index: 20;
+            background: rgba(5, 8, 15, 0.78);
+            -webkit-backdrop-filter: blur(14px);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--line);
         }
 
-        .section-bg {
+        .site-header .bar {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 12px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 28px;
+        }
+
+        .site-header img { height: 46px; width: auto; display: block; }
+
+        .site-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 30px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .site-nav a { text-decoration: none; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        #lang-switch {
+            font: inherit;
+            color: var(--muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 2px;
+        }
+
+        #lang-switch:hover { color: var(--white); }
+
+        .pill-outline {
+            text-decoration: none;
+            color: var(--white);
+            border: 1.5px solid rgba(233, 238, 246, 0.6);
+            border-radius: 999px;
+            padding: 9px 20px;
+            white-space: nowrap;
+        }
+
+        /* ==========================================================================
+           HERO (video background that fades out as you scroll)
+           ========================================================================== */
+        .hero {
+            position: relative;
+            margin-top: -71px;
+            padding: 230px 28px 170px;
+            text-align: center;
+        }
+
+        .hero-video {
             position: absolute;
             inset: 0;
+            overflow: hidden;
+            pointer-events: none;
         }
 
-        .section-bg video {
+        .hero-video video {
+            position: absolute;
+            inset: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Subtle dark tint over the video so text on the home section remains legible */
-        .section-bg::after {
+        .hero-video::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: rgba(0, 0, 0, 0.35);
-            pointer-events: none;
+            background: linear-gradient(to bottom,
+                rgba(5, 8, 15, 0.55) 0%,
+                rgba(5, 8, 15, 0.35) 35%,
+                rgba(5, 8, 15, 0.6) 70%,
+                var(--bg) 100%);
         }
 
-        /* ==========================================================================
-           3. NAVIGATION & HEADER
-           ========================================================================== */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 10vh;
-            background: rgba(255, 255, 255, 0); 
-            backdrop-filter: blur(10px);
-            z-index: 100;
+        .hero-copy { position: relative; max-width: 980px; margin: 0 auto; }
+
+        .hero h1 {
+            font-size: clamp(46px, 7vw, 96px);
+            line-height: 1.04;
+            letter-spacing: -0.035em;
+        }
+
+        .hero h1 span { color: var(--dim); }
+
+        .hero p {
+            margin: 30px auto 0;
+            max-width: 620px;
+            font-size: 19px;
+            color: #C9D2DE;
+        }
+
+        .hero-actions {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 4rem;
-            transition: background-color 0.3s ease;
-        }
-
-        .header-left {
-            flex: 0 0 15%;
-            display: flex;
-            align-items: center;
-        }
-
-        .header-left img {
-            max-height: 90px;
-            width: auto;
-            object-fit: contain;
-            cursor: pointer;
-            transition: opacity 0.3s ease;
-        }
-
-        .header-left img:hover {
-            opacity: 0.8;
-        }
-
-        .header-middle {
-            flex: 0 0 70%;
-            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 12px;
+            margin-top: 36px;
         }
 
-        .header-right {
-            flex: 0 0 15%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-        }
-
-        nav {
-            display: flex;
-            gap: 3rem;
-            align-items: center;
-        }
-
-        .nav-widget {
-            position: relative;
-            padding: 0.5rem 0;
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 0.3px;
-            color: #ffffff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: transparent;
-            border: none;
-            text-transform: uppercase;
-        }
-
-        .nav-widget:hover,
-        .nav-widget.active {
-            color: #ffffff;
-            transform: translateY(-1px);
-        }
-        
-        /* Scrolled state - gray text */
-        .nav-widget.scrolled {
-            color: #666666;
-        }
-        
-        .nav-widget.scrolled:hover,
-        .nav-widget.scrolled.active {
-            color: #0066cc;
-            transform: translateY(-1px);
-        }
-
-        .nav-widget.active {
-            font-weight: 600;
-        }
-
-        /* Underline indicator for active navigation item */
-        .nav-widget.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #0066cc;
-        }
-
-        /* Language toggle button */
-        #lang-switch {
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            color: #ffffff;
-            background: transparent;
-            border: 2px solid #ffffff;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        #lang-switch:hover {
-            color: #ffffff;
-            border-color: #ffffff;
-            transform: translateY(-1px);
-        }
-        
-        /* Scrolled state - gray text and border */
-        #lang-switch.scrolled {
-            color: #666666;
-            border-color: #666666;
-        }
-        
-        #lang-switch.scrolled:hover {
-            color: #0066cc;
-            border-color: #0066cc;
-            transform: translateY(-1px);
-        }
-
-        /* ==========================================================================
-           4. MAIN CONTENT LAYOUT
-           ========================================================================== */
-        main {
-            margin-top: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5rem 4rem;
-            position: relative;
-        }
-
-        /* Section Background logic — all transparent, video shows through */
-        #home { background: transparent; }
-        #expertise { background: transparent; }
-        #about { background: transparent; }
-        #roadmap { background: transparent; }
-        #projects { background: transparent; }
-        #contact { background: transparent; }
-
-        /* Non-home sections: give the section itself room for the box margins */
-        #expertise,
-        #about,
-        #roadmap,
-        #projects,
-        #contact {
-            padding: 3rem 3rem;   /* space between viewport edge and the box */
-        }
-
-        /* The rounded box that wraps each non-home section's content */
-        .section-box {
-            width: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(0, 55, 100, 0.85) 0%,
-                rgba(0, 20, 45, 0.90) 100%
-            );
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.10);
-            padding: 4rem;
-            box-shadow: 0 8px 48px rgba(0, 0, 0, 0.45);
-        }
-
-        .section-content {
-            max-width: 1200px;
-            width: 100%;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInUp 0.8s ease forwards;
-            position: relative;
-            z-index: 10;
-        }
-
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ==========================================================================
-           5. TYPOGRAPHY
-           ========================================================================== */
-        h1 {
-            font-size: 3.5rem;
-            font-weight: 300;
-            margin-bottom: 2rem;
-            color: #1a1a1a;
-            line-height: 1.2;
-            letter-spacing: -0.5px;
-        }
-
-        h1 strong {
-            font-weight: 600;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: #1a1a1a;
-            font-weight: 600;
-        }
-
-        h3 {
-            font-size: 1.35rem;
-            margin-top: 1rem;
-            margin-bottom: 0.5rem;
-            color: #1a1a1a;
-            font-weight: 600;
-        }
-
-        p {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: #666666;
-            margin-bottom: 1.5rem;
-            max-width: 850px;
-        }
-
-        .subtitle {
-            font-size: 1.25rem;
-            color: #444444;
-            margin-bottom: 3rem;
-            font-weight: 400;
-        }
-
-        /* ==========================================================================
-           6. COMPONENTS (Expertise Carousel, Buttons, Forms)
-           ========================================================================== */
-
-        /* Carousel wrapper */
-        .expertise-carousel {
-            position: relative;
-            margin-top: 4rem;
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        /* Arrow buttons */
-        .carousel-arrow {
-            flex-shrink: 0;
-            align-self: center;
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1.5px solid rgba(255, 255, 255, 0.35);
-            color: #ffffff;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.25s ease, transform 0.2s ease, opacity 0.25s ease;
-            z-index: 10;
-            padding: 0;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-
-        .carousel-arrow:hover {
-            background: rgba(255, 255, 255, 0.28);
-            transform: none;
-            box-shadow: none;
-        }
-
-        .carousel-arrow:active {
-            transform: scale(0.93);
-        }
-
-        .carousel-arrow svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-        }
-
-        /* Track that clips the visible area */
-        .carousel-track-wrapper {
-            flex: 1;
-            overflow: hidden;
-            padding: 2rem 0 2.5rem;
-        }
-
-        /* Sliding track */
-        .expertise-grid {
-            display: flex;
-            gap: 2rem;
-            transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
-            will-change: transform;
-            align-items: center;
-        }
-
-        /* Flip Card Wrapper */
-        .expertise-card {
-            perspective: 1200px;
-            min-height: 510px;
-            flex: 0 0 calc(60.9% - 1rem);
-            cursor: pointer;
-            font-size: 1.35rem;
-            color: #1a1a1a;
-            font-weight: 600;
-            transition: opacity 0.45s ease, filter 0.45s ease, transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1);
-            transform-origin: center center;
-        }
-
-        /* Dim and shrink non-active cards */
-        .expertise-card.carousel-prev,
-        .expertise-card.carousel-next {
-            opacity: 0.38;
-            filter: blur(1px);
-            pointer-events: none;
-            transform: scale(0.5);
-        }
-
-        /* Active card is fully visible, full size, and clickable */
-        .expertise-card.carousel-active {
-            opacity: 1;
-            filter: none;
-            pointer-events: auto;
-            transform: scale(1);
-        }
-
-        .card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            min-height: 510px;
-            transform-style: preserve-3d;
-            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1),
-                        box-shadow 0.3s ease,
-                        translate 0.3s ease;
-            border-radius: 8px;
-        }
-
-        /* Lift on hover to signal flippability — active card only */
-        .expertise-card.carousel-active:hover .card-inner {
-            translate: 0 -8px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
-        }
-
-        /* Flipped state */
-        .expertise-card.flipped .card-inner {
-            transform: rotateY(180deg);
-            translate: 0 0;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
-        }
-
-        /* Front & Back shared */
-        .card-face {
-            position: absolute;
-            inset: 0;
-            border-radius: 8px;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            padding: 2.5rem;
-            border: 1px solid #e5e5e5;
-        }
-
-        /* Front face */
-        .card-front {
-            background: #ffffff;
-        }
-
-        /* Back face — flipped 180° */
-        .card-back {
-            background: #0066cc;
-            transform: rotateY(180deg);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* Front face elements */
-        .expertise-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .expertise-header-left {
-            flex: 0 0 20%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .expertise-header-right {
-            flex: 0 0 80%;
-            padding-left: 1rem;
-        }
-
-        .expertise-card .icon {
-            width: 60px;
-            height: 60px;
-            background: #0066cc;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-        }
-
-        .card-front h3 {
-            color: #1a1a1a;
-        }
-
-        .card-front p {
-            font-size: 0.95rem;
-            color: #666666;
-            line-height: 1.7;
-        }
-
-        /* Flip hint on front face */
-        .flip-hint {
-            position: absolute;
-            bottom: 1.2rem;
-            right: 1.5rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #0066cc;
-            opacity: 0;
-            transition: opacity 0.25s ease;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .flip-hint::after {
-            content: '↻';
-            font-size: 1rem;
-        }
-
-        .expertise-card.carousel-active:hover .flip-hint {
-            opacity: 1;
-        }
-
-        /* Back face elements */
-        .card-back h3 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 1.2rem;
-            opacity: 0.75;
-        }
-
-        .card-back ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .card-back ul li {
-            font-size: 0.88rem;
-            color: #ffffff;
-            line-height: 1.5;
-            font-weight: 400;
-            padding-left: 1rem;
-            position: relative;
-        }
-
-        .card-back ul li::before {
-            content: '—';
-            position: absolute;
-            left: 0;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.75rem;
-        }
-
-        /* Back close hint */
-        .back-hint {
-            margin-top: 1.2rem;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.5);
-            text-align: right;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        .card-outcome {
-            margin-top: 1.1rem;
-            padding-top: 0.9rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: 500;
-            font-style: italic;
-            line-height: 1.5;
-        }
-
-        .card-outcome strong {
-            font-style: normal;
-            opacity: 0.6;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.68rem;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        /* Dot indicators */
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 1.5rem;
-        }
-
-        .carousel-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: background 0.3s ease, transform 0.3s ease;
-            cursor: pointer;
-            border: none;
-            padding: 0;
-        }
-
-        .carousel-dot.active {
-            background: #ffffff;
-            transform: scale(1.3);
-        }
-
-        /* Form Controls */
-        .contact-form {
-            max-width: 600px;
-            margin-top: 3rem;
-        }
-
-        .form-group {
-            margin-bottom: 2rem;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.7rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #1a1a1a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 1rem;
-            background: #ffffff;
-            border: 1px solid #d0d0d0;
-            border-radius: 4px;
-            color: #1a1a1a;
-            font-size: 1rem;
-            font-family: inherit;
-            transition: all 0.3s ease;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #0066cc;
-            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-        }
-
-        textarea {
-            resize: vertical;
-            min-height: 150px;
-        }
-
-        /* Buttons */
-        button, .button_1, .button_2, .button_3 {
-            padding: 1rem 1.5rem;
-            border-radius: 4px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-block;
+        .btn-solid, .btn-outline {
             text-decoration: none;
+            border-radius: 999px;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 15px 28px;
         }
 
-        button, .button_1 {
-            background: #0066cc;
-            color: #ffffff;
-            border: none;
-        }
+        .btn-solid { color: var(--bg); background: var(--white); }
+        .btn-solid:hover { color: var(--bg); background: #E3EAF3; }
 
-        button:hover, .button_1:hover {
-            background: #0052a3;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
-        }
-
-        .button_2 {
-            background: transparent;
-            color: #0066cc;
-            border: 2px solid #0066cc;
-        }
-
-        .button_3 {
-            background: rgba(0, 0, 0, 0.2); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            color: #ffffff;
-            border: 4px solid #0066cc;
-            font-size: 1rem;
-            border-radius: 4px;
-        }
-
-        .button_2:hover, .button_3:hover {
-            background: #0066cc;
-            color: #ffffff;
-            transform: translateY(-2px);
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 3rem;
-        }
-
-        /* All sections have a dark background — white text everywhere */
-        #home .section-content h1,
-        #home .section-content p,
-        #home .section-content .subtitle,
-        #expertise .section-content h2,
-        #expertise .section-content p,
-        #about .section-content h2,
-        #about .section-content h3,
-        #about .section-content p,
-        #roadmap .section-content h2,
-        #roadmap .section-content p,
-        #projects .section-content h2,
-        #projects .section-content h3,
-        #projects .section-content p,
-        #contact .section-content h2,
-        #contact .section-content p {
-            color: #ffffff;
-        }
-
-        #contact label {
-            color: #ffffff;
-        }
-
-        /* Expertise cards have white card backgrounds — keep dark text inside them */
-        #expertise .section-content .card-front h3,
-        #expertise .section-content .card-front p {
-            color: #1a1a1a;
-        }
-
-        /* Roadmap panel front face has a white background — restore dark text */
-        #roadmap .panel-front .panel-step-title { color: #1a1a1a; }
-        #roadmap .panel-front .panel-strategy   { color: #666666; }
-        #roadmap .panel-front .panel-step-num   { color: #0066cc; }
-        #roadmap .panel-front .panel-flip-hint  { color: #0066cc; }
-
-        /* ==========================================================================
-           7. RESPONSIVE DESIGN
-           ========================================================================== */
-
-        /* Hamburger button — hidden on desktop */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            padding: 0.4rem;
-            order: 3;
-            margin-left: 0.75rem;
-        }
-
-        .hamburger span {
-            display: block;
-            width: 24px;
-            height: 2px;
-            background: #ffffff;
-            transition: background 0.3s, transform 0.3s, opacity 0.3s;
-        }
-
-        .hamburger.scrolled span { background: #666; }
-
-        /* Animated X state */
-        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-        .hamburger.open span:nth-child(2) { opacity: 0; }
-        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-        @media (max-width: 768px) {
-            header {
-                padding: 0 1.2rem;
-                height: 60px;
-                flex-wrap: nowrap;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .header-left {
-                flex: 1;
-                order: 1;
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-            }
-
-            .header-left img {
-                max-height: 52px;
-            }
-
-            /* Nav panel: hidden by default, drops down when .open */
-            .header-middle {
-                display: none;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background: rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(16px);
-                -webkit-backdrop-filter: blur(16px);
-                padding: 0.5rem 0 1.5rem;
-                flex: unset;
-                order: unset;
-                margin-top: 0;
-                z-index: 99;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .header-middle.open {
-                display: flex;
-            }
-
-            nav {
-                flex-direction: column;
-                gap: 0;
-                align-items: center;
-                width: 100%;
-            }
-
-            .nav-widget {
-                font-size: 0.9rem;
-                color: #ffffff !important;
-                padding: 0.9rem 2rem;
-                width: 100%;
-                text-align: center;
-            }
-
-            .nav-widget:hover,
-            .nav-widget.active {
-                color: #ffffff !important;
-                transform: none;
-                background: rgba(255, 255, 255, 0.1);
-            }
-
-            .header-right {
-                flex: 1;
-                order: 3;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-            }
-
-            #lang-switch {
-                padding: 0.3rem 0.6rem;
-                font-size: 0.75rem;
-                border-width: 1.5px;
-            }
-
-            .hamburger {
-                flex: 1;
-                order: 2;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-left: 0;
-            }
-
-            h1 { font-size: 2rem; }
-            h2 { font-size: 1.6rem; }
-            h3 { font-size: 1.2rem; }
-            p, .subtitle { font-size: 1rem; }
-            section { padding: 2.5rem 1.2rem; }
-            section { scroll-margin-top: 60px; }
-            .expertise-grid { gap: 1.2rem; }
-
-            /* On mobile, active card takes up more width */
-            .expertise-card {
-                flex: 0 0 99%;
-                min-height: 375px;
-            }
-
-            .card-inner {
-                min-height: 375px;
-            }
-
-            .carousel-arrow {
-                width: 38px;
-                height: 38px;
-                font-size: 1rem;
-            }
-
-            #expertise .section-content .card-front h3,
-            #expertise .section-content .card-front p {
-                color: #1a1a1a !important;
-            }
-
-            .cta-buttons {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .cta-buttons a {
-                width: 100%;
-                text-align: center;
-                box-sizing: border-box;
-            }
-        }
-
-        /* ==========================================================================
-           8. ROADMAP SECTION
-           ========================================================================== */
-
-        #roadmap .section-content h2,
-        #roadmap .section-content > p {
-            color: #ffffff;
-        }
-
-        /* Two-column layout: road on left, info panel on right */
-        .roadmap-layout {
-            display: grid;
-            grid-template-columns: 1fr 374px;
-            gap: 1.5rem;
-            margin-top: 4rem;
-            align-items: start;
-        }
-
-        /* ── SVG Road ─────────────────────────────────────────── */
-        .roadmap-road-wrap {
-            position: relative;
-            width: 100%;
-            padding: 1rem 0 2rem;
-        }
-
-        .roadmap-road-wrap svg {
-            width: 100%;
-            height: auto;
-            display: block;
-            overflow: visible;
-        }
-
-        /* Icon stop buttons on the road */
-        .road-stop {
-            cursor: pointer;
-            transition: filter 0.3s ease, transform 0.3s ease;
-            transform-origin: center;
-            transform-box: fill-box;
-        }
-
-        .road-stop:hover,
-        .road-stop.active {
-            filter: drop-shadow(0 0 10px rgba(0, 153, 255, 0.85));
-        }
-
-        .road-stop.active .stop-icon-bg {
-            fill: #0066cc;
-        }
-
-        .road-stop .stop-icon-bg {
-            fill: rgba(255, 255, 255, 0.12);
-            stroke: rgba(255, 255, 255, 0.45);
-            stroke-width: 1.5;
-            transition: fill 0.3s ease;
-        }
-
-        /* Step label below each icon */
-        .stop-label {
-            fill: rgba(255, 255, 255, 0.7);
-            font-size: 11px;
-            font-family: inherit;
+        .btn-outline {
+            color: var(--white);
+            border: 1.5px solid rgba(233, 238, 246, 0.35);
             font-weight: 600;
-            text-anchor: middle;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            pointer-events: none;
-            transition: fill 0.3s ease;
+            padding: 14px 27px;
         }
 
-        .road-stop.active .stop-label {
-            fill: #ffffff;
+        /* Page-load entrance for the hero only */
+        .rise { opacity: 0; transform: translateY(16px); animation: rise 0.9s cubic-bezier(.2, .7, .2, 1) forwards; }
+        .rise-2 { animation-delay: 0.15s; }
+        .rise-3 { animation-delay: 0.3s; }
+        @keyframes rise { to { opacity: 1; transform: none; } }
+
+        /* ==========================================================================
+           EXPERTISE (tabbed window)
+           ========================================================================== */
+        .expertise { position: relative; padding: 90px 28px 40px; }
+
+        .centered-intro { text-align: center; margin-bottom: 30px; }
+        .centered-intro h2 { margin-bottom: 10px; }
+        .centered-intro p { margin: 0 auto; max-width: 560px; }
+
+        .window-frame {
+            border-radius: 18px;
+            padding: 1px;
+            background: linear-gradient(160deg, rgba(51, 181, 234, 0.55), rgba(88, 80, 236, 0.35) 45%, rgba(233, 238, 246, 0.08));
         }
 
-        /* ── Info Panel (right column) ────────────────────────── */
-        /* ── Roadmap panel — flip card ────────────────────────── */
-
-        /* Outer wrapper: perspective container, fixed size */
-        .roadmap-panel {
-            perspective: 1200px;
-            height: 440px;
-            cursor: pointer;
-        }
-
-        /* The rotating inner */
-        .roadmap-panel-step {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1),
-                        box-shadow 0.3s ease,
-                        translate 0.3s ease;
-            border-radius: 12px;
-        }
-
-        /* Lift on hover */
-        .roadmap-panel:hover .roadmap-panel-step {
-            translate: 0 -6px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        }
-
-        /* Flipped state */
-        .roadmap-panel-step.panel-flipped {
-            transform: rotateY(180deg);
-            translate: 0 0;
-        }
-
-        /* Fade wrapper — opacity lives here, NOT on the preserve-3d element.
-           Animating opacity on a preserve-3d element collapses the 3D context
-           in browsers, causing the back face to render as a mirrored front. */
-        .roadmap-panel-wrap {
-            position: absolute;
-            inset: 0;
-            transition: opacity 0.22s ease;
-        }
-
-        /* Front & back shared */
-        .panel-face {
-            position: absolute;
-            inset: 0;
-            border-radius: 12px;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            padding: 2rem 1.75rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* Front — matches expertise card front exactly */
-        .panel-front {
-            background: #ffffff;
-            border: 1px solid #e5e5e5;
-        }
-
-        .panel-front .panel-step-num {
-            color: #0066cc;
-        }
-
-        .panel-front .panel-step-title {
-            color: #1a1a1a;
-        }
-
-        .panel-front .panel-strategy {
-            color: #666666;
-        }
-
-        .panel-front .panel-flip-hint {
-            color: #0066cc;
-        }
-
-        /* Back — solid blue like expertise card back */
-        .panel-back {
-            background: #0066cc;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            transform: rotateY(180deg);
-            justify-content: flex-start;
+        .window {
+            border-radius: 17px;
+            background: var(--panel);
             overflow: hidden;
         }
 
-        /* Flip hint */
-        .panel-flip-hint {
-            position: absolute;
-            bottom: 1.1rem;
-            right: 1.4rem;
-            font-size: 0.72rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.45);
-            opacity: 0;
-            transition: opacity 0.25s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+        .tabs {
             display: flex;
-            align-items: center;
             gap: 4px;
+            overflow-x: auto;
+            padding: 10px;
+            border-bottom: 1px solid var(--line);
+            background: var(--tab-bar);
         }
 
-        .panel-flip-hint::after { content: '↻'; font-size: 0.95rem; }
-
-        .roadmap-panel:hover .panel-flip-hint { opacity: 1; }
-
-        /* ── Front face content ───────────────────────────────── */
-        .panel-step-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.4rem;
-            padding-bottom: 1.1rem;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .panel-step-icon {
-            width: 52px;
-            height: 52px;
-            flex-shrink: 0;
-            background: #0066cc;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px;
-        }
-
-        .panel-step-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: invert(1) brightness(1);
-        }
-
-        .panel-step-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
-        }
-
-        .panel-step-num {
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: #0066cc;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .panel-step-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #1a1a1a;
-            line-height: 1.2;
-        }
-
-        .panel-strategy {
-            font-size: 0.85rem;
-            color: #666666;
-            line-height: 1.7;
-            margin-bottom: 0;
-        }
-
-        /* ── Back face content ────────────────────────────────── */
-        .panel-section-label {
-            font-size: 0.65rem;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 0.9px;
-            margin-bottom: 0.55rem;
-        }
-
-        .panel-activities {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 1.1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .panel-activities li {
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.88);
-            line-height: 1.5;
-            padding-left: 0.9rem;
-            position: relative;
-        }
-
-        .panel-activities li::before {
-            content: '—';
-            position: absolute;
-            left: 0;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.68rem;
-        }
-
-        .panel-outcome {
-            background: rgba(0, 0, 0, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            padding: 0.6rem 0.85rem;
-            font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.92);
-            line-height: 1.5;
-            font-style: italic;
-        }
-
-        .panel-outcome strong {
-            display: block;
-            font-style: normal;
-            font-size: 0.63rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            color: rgba(255, 255, 255, 0.5);
-            margin-bottom: 0.2rem;
-        }
-
-        .panel-back-hint {
-            margin-top: 1rem;
-            font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.4);
-            text-align: right;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
-
-        /* Roadmap nav arrows — sit below the panel in the right grid column */
-        .roadmap-nav {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 0.9rem;
-        }
-
-        .roadmap-arrow {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1.5px solid rgba(255, 255, 255, 0.3);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s ease, transform 0.15s ease;
-            padding: 0;
-            text-transform: none;
-            letter-spacing: 0;
-        }
-
-        .roadmap-arrow svg {
-            width: 16px;
-            height: 16px;
-        }
-
-        .roadmap-arrow:hover {
-            background: rgba(255, 255, 255, 0.24);
-            transform: none;
-            box-shadow: none;
-        }
-
-        .roadmap-arrow:active {
-            transform: scale(0.93);
-        }
-
-        .roadmap-arrow:disabled {
-            opacity: 0.25;
-            cursor: default;
-        }
-
-        .roadmap-nav-counter {
-            font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.5);
+        .tab {
+            flex: 0 0 auto;
+            font: inherit;
+            font-size: 14px;
             font-weight: 500;
-            min-width: 2.5rem;
-            text-align: center;
-            letter-spacing: 0.3px;
+            color: #8E9AAD;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            padding: 11px 16px;
+            min-height: 44px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.2s, background-color 0.2s, border-color 0.2s;
         }
 
-        /* Responsive — stack on smaller screens */
-        @media (max-width: 960px) {
-            .roadmap-layout {
-                grid-template-columns: 1fr;
-                align-items: start;
-            }
-            .roadmap-panel {
-                height: 440px;
+        .tab:hover { color: var(--white); }
+
+        .tab[aria-selected="true"] {
+            color: var(--white);
+            font-weight: 600;
+            background: #18233A;
+            border-color: rgba(51, 181, 234, 0.5);
+        }
+
+        .panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px 56px;
+            padding: clamp(28px, 4vw, 52px);
+        }
+
+        .panel[hidden] { display: none; }
+
+        .panel.is-entering { animation: panel-in 0.35s ease; }
+        @keyframes panel-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+        .panel-main { flex: 999 1 440px; min-width: 0; }
+
+        .panel-main h3 {
+            font-size: clamp(26px, 2.8vw, 36px);
+            line-height: 1.15;
+            letter-spacing: -0.02em;
+            margin-bottom: 16px;
+        }
+
+        .panel-main p:first-of-type { color: var(--text-strong); margin-bottom: 12px; }
+
+        .panel-side { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 18px; }
+
+        .key-services { background: var(--panel-2); border-radius: 14px; padding: 22px 24px; }
+
+        .label { font-size: 13px; font-weight: 700; color: var(--sky-label); }
+
+        .key-services h4 { margin-bottom: 12px; }
+
+        .checklist { list-style: none; display: flex; flex-direction: column; gap: 9px; font-size: 15px; line-height: 1.5; color: var(--text-strong); }
+
+        .checklist li { display: flex; gap: 10px; }
+
+        .checklist li::before {
+            content: '';
+            flex: 0 0 auto;
+            width: 12px;
+            height: 7px;
+            margin-top: 8px;
+            border-left: 2.4px solid var(--sky);
+            border-bottom: 2.4px solid var(--sky);
+            transform: rotate(-45deg);
+        }
+
+        .outcome { border: 1px solid rgba(51, 181, 234, 0.3); border-radius: 14px; padding: 18px 24px; }
+
+        .outcome p:last-child { color: var(--white); font-weight: 500; }
+
+        /* ==========================================================================
+           ABOUT
+           ========================================================================== */
+        .about { position: relative; padding: 140px 28px 120px; overflow-x: clip; }
+
+        .about .wrap { position: relative; display: flex; flex-wrap: wrap; gap: 48px 80px; align-items: flex-start; }
+
+        .about-main { flex: 1 1 420px; min-width: 0; }
+
+        .about-main h2 { margin-bottom: 22px; font-size: clamp(34px, 4vw, 52px); line-height: 1.1; letter-spacing: -0.025em; }
+
+        .about-main h3 { font-size: 15px; font-weight: 700; color: var(--sky-label); margin-bottom: 10px; }
+
+        .about-main p { font-size: 21px; line-height: 1.55; color: var(--text-strong); }
+
+        .about-side { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+
+        .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+
+        .card h3 { font-size: 19px; margin-bottom: 8px; }
+
+        /* ==========================================================================
+           ROADMAP
+           ========================================================================== */
+        .approach { padding: 60px 28px 120px; }
+
+        .approach .wrap { max-width: 1000px; }
+
+        .approach h2 { margin: 0 auto 70px; max-width: 760px; text-align: center; }
+
+        .steps { list-style: none; }
+
+        .step { display: flex; gap: 28px; }
+
+        .step-rail { flex: 0 0 44px; display: flex; flex-direction: column; align-items: center; }
+
+        .step-num {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1.5px solid var(--sky);
+            background: var(--panel);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .step-line { flex: 1 1 auto; width: 0; border-left: 2px dashed rgba(233, 238, 246, 0.22); min-height: 30px; }
+
+        .step-body { flex: 1 1 auto; min-width: 0; padding: 6px 0 56px; }
+
+        .step-body h3 { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 10px; }
+
+        .step-body > p:first-of-type { color: var(--text-strong); margin-bottom: 8px; }
+
+        details.activities {
+            margin-top: 18px;
+            max-width: 620px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px 20px;
+        }
+
+        details.activities summary {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--sky-label);
+            min-height: 28px;
+            cursor: pointer;
+        }
+
+        details.activities summary::-webkit-details-marker { display: none; }
+
+        details.activities summary svg { transition: transform 0.2s; }
+        details.activities[open] summary svg { transform: rotate(180deg); }
+
+        details.activities ul { margin: 12px 0 0 18px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.5; color: var(--text-strong); }
+
+        details.activities .step-outcome { margin-top: 14px; font-size: 15px; color: var(--white); }
+
+        details.activities .step-outcome span { display: block; }
+
+        /* ==========================================================================
+           WORK
+           ========================================================================== */
+        .work { position: relative; padding: 60px 28px 120px; overflow-x: clip; }
+
+        .work .wrap { position: relative; }
+
+        .work .centered-intro { margin-bottom: 70px; }
+
+        .project { display: flex; flex-wrap: wrap; align-items: center; gap: 40px 72px; margin-bottom: 100px; }
+
+        .project:last-child { margin-bottom: 0; }
+
+        .project.flip { flex-wrap: wrap-reverse; }
+
+        .project-text, .project-visual { flex: 1 1 420px; min-width: 0; }
+
+        .project-text h3 { font-size: clamp(24px, 2.4vw, 32px); line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 14px; }
+
+        .project-visual { background: var(--panel); border: 1px solid rgba(233, 238, 246, 0.1); border-radius: 18px; padding: 24px; }
+
+        .project-visual svg { display: block; width: 100%; height: auto; }
+
+        /* ==========================================================================
+           CONTACT & FOOTER
+           ========================================================================== */
+        .contact { position: relative; padding: 120px 28px; border-top: 1px solid var(--line); overflow: hidden; }
+
+        .contact .wrap { position: relative; max-width: 720px; text-align: center; }
+
+        .contact h2 { font-size: clamp(36px, 4.6vw, 60px); line-height: 1.06; letter-spacing: -0.03em; margin-bottom: 14px; }
+
+        .contact .wrap > p { font-size: 18px; color: #C9D2DE; margin-bottom: 40px; }
+
+        .contact-form {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(11, 17, 29, 0.85);
+            border: 1px solid rgba(233, 238, 246, 0.1);
+            border-radius: 20px;
+            padding: clamp(24px, 3vw, 36px);
+        }
+
+        .form-row { display: flex; flex-wrap: wrap; gap: 16px; }
+
+        .field { flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; }
+
+        .field label { font-size: 14px; font-weight: 600; color: #E9EEF6; }
+
+        .field input, .field textarea {
+            font: inherit;
+            font-size: 16px;
+            padding: 13px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--line-2);
+            background: var(--bg);
+            color: var(--white);
+        }
+
+        .field textarea { min-height: 140px; resize: vertical; }
+
+        .contact-form button {
+            align-self: flex-start;
+            font: inherit;
+            font-weight: 700;
+            font-size: 15px;
+            background: var(--white);
+            color: var(--bg);
+            border: none;
+            border-radius: 999px;
+            padding: 15px 28px;
+            cursor: pointer;
+        }
+
+        .contact-form button:hover { background: #E3EAF3; }
+
+        .site-footer { position: relative; border-top: 1px solid var(--line); padding: 30px 28px; }
+
+        .site-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; font-size: 14px; color: var(--muted); }
+
+        .site-footer img { height: 40px; width: auto; display: block; }
+
+        /* ==========================================================================
+           SCROLL-DRIVEN MOTION
+           Native in browsers that support scroll timelines; a small script below
+           does the same in the others. Everything stays still for reduced motion.
+           ========================================================================== */
+        @media (prefers-reduced-motion: no-preference) {
+            @supports (animation-timeline: view()) {
+                .hero-video { animation: hero-fade linear both; animation-timeline: view(); animation-range: exit 0% exit 90%; }
+                .hero-copy { animation: hero-copy-out linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+                .reveal { animation: reveal linear both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
+                .reveal-scale { animation: reveal-scale linear both; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+                .reveal-left { animation: reveal-left linear both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
+                .reveal-right { animation: reveal-right linear both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
+                .step { animation: step-in linear both; animation-timeline: view(); animation-range: entry 15% cover 40%; }
+                .parallax { animation: parallax linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
             }
         }
 
-        /* Mobile: boxes used desktop padding, which squeezed text into a narrow column,
-           collapsed the service cards and let roadmap text overflow its panel */
-        @media (max-width: 768px) {
-            #expertise,
-            #about,
-            #roadmap,
-            #projects,
-            #contact {
-                padding: 2rem 0.75rem;
-            }
+        @keyframes hero-fade { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes hero-copy-out { to { opacity: 0; transform: translateY(-70px) scale(0.94); } }
+        @keyframes reveal { from { opacity: 0; transform: translateY(48px); } to { opacity: 1; transform: none; } }
+        @keyframes reveal-scale { from { opacity: 0.15; transform: translateY(70px) scale(0.88); } to { opacity: 1; transform: none; } }
+        @keyframes reveal-left { from { opacity: 0; transform: translateX(-64px); } to { opacity: 1; transform: none; } }
+        @keyframes reveal-right { from { opacity: 0; transform: translateX(64px); } to { opacity: 1; transform: none; } }
+        @keyframes step-in { from { opacity: 0.12; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+        @keyframes parallax { from { transform: translateY(70px) scale(0.95); } to { transform: translateY(-70px) scale(1); } }
 
-            .section-box {
-                padding: 2rem 1.25rem;
-                border-radius: 14px;
-            }
-
-            .expertise-carousel {
-                gap: 0.4rem;
-                margin-top: 1.5rem;
-            }
-
-            .carousel-arrow {
-                width: 32px;
-                height: 32px;
-            }
-
-            .carousel-track-wrapper {
-                padding: 1rem 0 1.5rem;
-            }
-
-            .expertise-card {
-                flex: 0 0 100%;
-            }
-
-            .expertise-card,
-            .card-inner {
-                min-height: 540px;
-            }
-
-            .card-face {
-                padding: 1.4rem;
-            }
-
-            #expertise .section-content .card-front p {
-                font-size: 0.9rem;
-                line-height: 1.6;
-            }
-
-            .card-back h3 {
-                margin-bottom: 0.8rem;
-            }
-
-            .card-back ul li {
-                font-size: 0.84rem;
-            }
-
-            .expertise-header-left {
-                flex: 0 0 auto;
-            }
-
-            .expertise-card .icon {
-                width: 48px;
-                height: 48px;
-                font-size: 1.4rem;
-            }
-
-            .card-back ul {
-                gap: 0.4rem;
-            }
-
-            .roadmap-layout {
-                margin-top: 1.5rem;
-            }
-
-            .roadmap-panel {
-                height: 470px;
-            }
-
-            .panel-face {
-                padding: 1.5rem 1.25rem;
-            }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .rise, .panel.is-entering { animation: none; opacity: 1; transform: none; }
         }
 
-
-        /* Tablets: widen the active service card so its text isn't squeezed into a tall column */
-        @media (min-width: 769px) and (max-width: 1100px) {
-            .expertise-card {
-                flex: 0 0 82%;
-            }
+        /* ==========================================================================
+           SMALL SCREENS
+           ========================================================================== */
+        @media (max-width: 820px) {
+            .site-nav { display: none; }
+            .site-header .bar { padding: 10px 16px; }
+            .site-header img { height: 40px; }
+            .hero { margin-top: -63px; padding: 150px 16px 120px; }
+            .expertise, .about, .approach, .work, .contact { padding-left: 16px; padding-right: 16px; }
+            .about { padding-top: 100px; padding-bottom: 80px; }
+            .project { margin-bottom: 72px; }
+            .step { gap: 16px; }
+            .step-body h3 { font-size: 24px; }
         }
     </style>
 </head>
 <body>
-    <!-- =====================================================================
-         PER-SECTION VIDEO BACKGROUNDS
-         Each .section-bg corresponds to one page section.
-         Set your MP4 filenames in the VIDEO CONFIGURATION script below.
-         ===================================================================== -->
-    <!-- Single video background — plays behind all sections -->
-    <div id="section-bg-container">
-        <div class="section-bg active" id="bg-home">
-            <video autoplay loop muted playsinline id="home-bg-video">
-                <source id="home-video-source" type="video/mp4">
-            </video>
-        </div>
-    </div>
-
-    <header>
-        <div class="header-left">
-            <img src="../media/Laplace-solutions_logo_blanc.svg" alt="Laplace Solutions Logo" onclick="document.getElementById('home').scrollIntoView({ behavior: 'smooth' })">
-        </div>
-        <div class="header-middle">
-            <nav>
-                <div class="nav-widget" data-target="about">ABOUT US</div>
-                <div class="nav-widget" data-target="expertise">OUR EXPERTISE</div>
-                <div class="nav-widget" data-target="roadmap">OUR APPROACH</div>
-                <div class="nav-widget" data-target="contact">CONTACT US</div>
+    <header class="site-header">
+        <div class="bar">
+            <a href="#top" aria-label="Laplace Solutions, back to top"><img src="../media/Laplace-solutions_logo_blanc.svg" alt="Laplace Solutions"></a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="#about">About Us</a>
+                <a href="#expertise">Our Expertise</a>
+                <a href="#approach">Our Approach</a>
+                <a href="#work">Our Work</a>
             </nav>
-        </div>
-        <button class="hamburger" id="hamburger" aria-label="Toggle menu">
-            <span></span><span></span><span></span>
-        </button>
-        <div class="header-right">
-            <button id="lang-switch">EN</button>
+            <div class="header-actions">
+                <button id="lang-switch" type="button" lang="fr" aria-label="Version française">FR</button>
+                <a class="pill-outline" href="#contact">Contact Us</a>
+            </div>
         </div>
     </header>
 
-    <main id="main-content">
-        
-        <section id="home">
-            <div class="section-content">
-                <h1 style="color: #ffffff;">
-                    <strong>
-                        Data Driven Strategy.<br>
-                        Scalable Technology.<br>
-                        <!-- CFO Services. -->
-                        <!-- CFO-Level Strategy. Scalable Tech. -->
-                        <!-- Smarter Pricing. Stronger Margins. -->
-                    </strong>
-                </h1>
-                <p class="subtitle" style="color: #ffffff;">
-                    Real problems. Practical solutions.<br>
-                    From the first question to the finished tool, we find what's holding you back and build what moves you forward.
-                </p>
-                <div class="cta-buttons">
-                    <a href="#expertise" class="button_3">Learn More</a>
-                    <a href="#contact" class="button_3">Schedule a Consultation</a>
+    <main>
+        <section class="hero" id="top">
+            <div class="hero-video" aria-hidden="true">
+                <video autoplay muted loop playsinline preload="auto" poster="../media/hero-poster.jpg">
+                    <source src="../media/hero-bg.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="hero-copy">
+                <h1 class="rise">Data Driven Strategy.<br><span>Scalable Technology.</span></h1>
+                <p class="rise rise-2">Real problems. Practical solutions.<br>From the first question to the finished tool, we find what's holding you back and build what moves you forward.</p>
+                <div class="hero-actions rise rise-3">
+                    <a class="btn-solid" href="#contact">Schedule a Consultation</a>
+                    <a class="btn-outline" href="#expertise">Learn More</a>
                 </div>
             </div>
         </section>
 
-        <section id="about">
-            <div class="section-content section-box">
-                <h2>
-                    About Us
-                </h2>
-
-                <div class="about-block">
-                    <h3>
-                        Who We Are
-                    </h3>
-                    <p>
-                        We bring actuarial expertise and software development skills under one roof.
-                        That gives us a wide range, from analytics and forecasting to performance tracking and custom software,
-                        and you work directly with the people solving your challenge.
-                    </p>
+        <section class="expertise" id="expertise">
+            <div class="wrap">
+                <div class="centered-intro reveal">
+                    <h2 class="section-title">Our Expertise</h2>
+                    <p>Six areas of expertise, one team behind all of them. Explore what we can do for your business:</p>
                 </div>
 
-                <div class="about-block">
-                    <h3>
-                        Our Mission
-                    </h3>
-                    <p>
-                        To bring practical, data-driven solutions within reach of every business, so they can solve real problems and grow with confidence.
-                    </p>
-                </div>
+                <div class="window-frame reveal-scale">
+                    <div class="window">
+                        <div class="tabs" role="tablist" aria-label="Areas of expertise">
+                            <button class="tab" type="button" role="tab" id="tab-software" aria-controls="panel-software" aria-selected="true">Custom Software &amp; Automation</button>
+                            <button class="tab" type="button" role="tab" id="tab-analytics" aria-controls="panel-analytics" aria-selected="false" tabindex="-1">Analytics, KPIs &amp; Monitoring</button>
+                            <button class="tab" type="button" role="tab" id="tab-forecasting" aria-controls="panel-forecasting" aria-selected="false" tabindex="-1">Forecasting &amp; Reserving</button>
+                            <button class="tab" type="button" role="tab" id="tab-pricing" aria-controls="panel-pricing" aria-selected="false" tabindex="-1">Pricing &amp; Profitability</button>
+                            <button class="tab" type="button" role="tab" id="tab-finops" aria-controls="panel-finops" aria-selected="false" tabindex="-1">Cloud Cost Management (FinOps)</button>
+                            <button class="tab" type="button" role="tab" id="tab-cfo" aria-controls="panel-cfo" aria-selected="false" tabindex="-1">Fractional CFO &amp; Accounting Oversight</button>
+                        </div>
 
-                <div class="about-block">
-                    <h3>
-                        How We're Different
-                    </h3>
-                    <p>
-                        One team, start to finish, held to two standards: the rigour of actuarial work and the quality of well-built tools.
-                        The result is solutions you can trust, built to last.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section id="expertise">
-            <div class="section-content section-box">
-                <h2>
-                    Our Expertise
-                </h2>
-                <p>
-                    Six areas of expertise, one team behind all of them. Explore what we can do for your business:
-                </p>
-
-                <div class="expertise-carousel">
-                    <button class="carousel-arrow" id="carousel-prev" aria-label="Previous card">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="15 18 9 12 15 6"/>
-                        </svg>
-                    </button>
-
-                    <div class="carousel-track-wrapper">
-                        <div class="expertise-grid" id="expertise-grid">
-
-                            <div class="expertise-card" data-index="0">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">⚙️</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Custom Software &amp;<br> Automation</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            Manual processes slow you down and invite errors. We design and build custom applications that take the repetitive work off your team's plate.<br><br>
-                                            From data processing to full applications with their own database, every tool is built around the way your business actually runs.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Custom applications and databases built around your process.</li>
-                                            <li>Automation of manual and repetitive workflows.</li>
-                                            <li>Automated data validation, anomaly detection and correction.</li>
-                                            <li>Data processing pipelines that run on their own.</li>
-                                            <li>Integration between your existing systems.</li>
-                                            <li>Ongoing support and improvements as your needs evolve.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Faster processes, cleaner data and software built to grow with your business.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-software" aria-labelledby="tab-software">
+                            <div class="panel-main">
+                                <h3>Custom Software &amp; Automation</h3>
+                                <p>Manual processes slow you down and invite errors. We design and build custom applications that take the repetitive work off your team's plate.</p>
+                                <p>From data processing to full applications with their own database, every tool is built around the way your business actually runs.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Custom applications and databases built around your process.</li>
+                                        <li>Automation of manual and repetitive workflows.</li>
+                                        <li>Automated data validation, anomaly detection and correction.</li>
+                                        <li>Data processing pipelines that run on their own.</li>
+                                        <li>Integration between your existing systems.</li>
+                                        <li>Ongoing support and improvements as your needs evolve.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>Faster processes, cleaner data and software built to grow with your business.</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="expertise-card" data-index="1">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">📊</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Analytics, KPIs &amp;<br> Monitoring</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            You can't improve what you can't see. We design the KPIs that matter to your business and build dashboards that keep them up to date, automatically.<br><br>
-                                            From sales performance to team metrics, you get a clear view of what's working and what needs attention.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Custom KPI design aligned with your goals.</li>
-                                            <li>Live, automatically updated dashboards.</li>
-                                            <li>Sales and product performance tracking.</li>
-                                            <li>Team and individual performance metrics.</li>
-                                            <li>Alerts on the trends and outliers that need attention.</li>
-                                            <li>Data consolidation from your existing systems.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>A clear, real-time view of your business, and the insight to act on it.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-analytics" aria-labelledby="tab-analytics" hidden>
+                            <div class="panel-main">
+                                <h3>Analytics, KPIs &amp; Monitoring</h3>
+                                <p>You can't improve what you can't see. We design the KPIs that matter to your business and build dashboards that keep them up to date, automatically.</p>
+                                <p>From sales performance to team metrics, you get a clear view of what's working and what needs attention.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Custom KPI design aligned with your goals.</li>
+                                        <li>Live, automatically updated dashboards.</li>
+                                        <li>Sales and product performance tracking.</li>
+                                        <li>Team and individual performance metrics.</li>
+                                        <li>Alerts on the trends and outliers that need attention.</li>
+                                        <li>Data consolidation from your existing systems.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>A clear, real-time view of your business, and the insight to act on it.</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="expertise-card" data-index="2">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">📈</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Forecasting &amp;<br> Reserving</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            Plan for what's coming, not just what happened. We build forecasts for your sales, costs and cash flow, and test them against different scenarios so you're ready for the highs and the lows.<br><br>
-                                            If your business carries future obligations, like warranties, returns or claims, we estimate what to set aside with actuarial precision.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Sales, cost and cash flow forecasting.</li>
-                                            <li>Scenario and sensitivity analysis.</li>
-                                            <li>Reserve and provision estimates for future obligations.</li>
-                                            <li>Budget models your team can update on its own.</li>
-                                            <li>Regular comparison of forecasts with actual results.</li>
-                                            <li>Clear documentation of every assumption.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Forecasts you can trust and the peace of mind that you're covered.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-forecasting" aria-labelledby="tab-forecasting" hidden>
+                            <div class="panel-main">
+                                <h3>Forecasting &amp; Reserving</h3>
+                                <p>Plan for what's coming, not just what happened. We build forecasts for your sales, costs and cash flow, and test them against different scenarios so you're ready for the highs and the lows.</p>
+                                <p>If your business carries future obligations, like warranties, returns or claims, we estimate what to set aside with actuarial precision.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Sales, cost and cash flow forecasting.</li>
+                                        <li>Scenario and sensitivity analysis.</li>
+                                        <li>Reserve and provision estimates for future obligations.</li>
+                                        <li>Budget models your team can update on its own.</li>
+                                        <li>Regular comparison of forecasts with actual results.</li>
+                                        <li>Clear documentation of every assumption.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>Forecasts you can trust and the peace of mind that you're covered.</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="expertise-card" data-index="3">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">🏷️</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Pricing &amp;<br> Profitability</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            Price with confidence. We analyze your profitability by product, client and channel, and build pricing models that protect your margins as you grow.<br><br>
-                                            Grounded in actuarial pricing methods, every recommendation comes with the numbers behind it.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Profitability analysis by product, client, contract or channel.</li>
-                                            <li>Custom pricing models built from your data.</li>
-                                            <li>Review of your current pricing structure.</li>
-                                            <li>Impact analysis of price changes on volume and margin.</li>
-                                            <li>Cost analysis to find where margin is lost.</li>
-                                            <li>Ongoing monitoring of pricing performance.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>Smarter pricing decisions, backed by your own numbers.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-pricing" aria-labelledby="tab-pricing" hidden>
+                            <div class="panel-main">
+                                <h3>Pricing &amp; Profitability</h3>
+                                <p>Price with confidence. We analyze your profitability by product, client and channel, and build pricing models that protect your margins as you grow.</p>
+                                <p>Grounded in actuarial pricing methods, every recommendation comes with the numbers behind it.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Profitability analysis by product, client, contract or channel.</li>
+                                        <li>Custom pricing models built from your data.</li>
+                                        <li>Review of your current pricing structure.</li>
+                                        <li>Impact analysis of price changes on volume and margin.</li>
+                                        <li>Cost analysis to find where margin is lost.</li>
+                                        <li>Ongoing monitoring of pricing performance.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>Smarter pricing decisions, backed by your own numbers.</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="expertise-card" data-index="4">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">☁️</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Cloud Cost Management<br> (FinOps)</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            Take control of your cloud spending. We make your costs visible, find savings and build the monitoring that keeps your budget on track.<br><br>
-                                            Whether you're on AWS, Azure or Google Cloud, you'll know what you're paying for and why.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Cloud usage and spending audit.</li>
-                                            <li>Cost allocation by team, product or client.</li>
-                                            <li>Right-sizing of resources and services.</li>
-                                            <li>Identification of unused or idle resources.</li>
-                                            <li>Budget alerts and monthly cost reporting.</li>
-                                            <li>Cost forecasting as your usage grows.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>A cloud bill you understand, and costs that grow only when your business does.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-finops" aria-labelledby="tab-finops" hidden>
+                            <div class="panel-main">
+                                <h3>Cloud Cost Management (FinOps)</h3>
+                                <p>Take control of your cloud spending. We make your costs visible, find savings and build the monitoring that keeps your budget on track.</p>
+                                <p>Whether you're on AWS, Azure or Google Cloud, you'll know what you're paying for and why.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Cloud usage and spending audit.</li>
+                                        <li>Cost allocation by team, product or client.</li>
+                                        <li>Right-sizing of resources and services.</li>
+                                        <li>Identification of unused or idle resources.</li>
+                                        <li>Budget alerts and monthly cost reporting.</li>
+                                        <li>Cost forecasting as your usage grows.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>A cloud bill you understand, and costs that grow only when your business does.</p>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="expertise-card" data-index="5">
-                                <div class="card-inner">
-                                    <div class="card-face card-front">
-                                        <div class="expertise-header">
-                                            <div class="expertise-header-left">
-                                                <div class="icon">🎯</div>
-                                            </div>
-                                            <div class="expertise-header-right">
-                                                <h3>Fractional CFO &amp;<br> Accounting Oversight</h3>
-                                            </div>
-                                        </div>
-                                        <p>
-                                            Not ready for a full-time CFO? We provide part-time financial leadership to keep your finances organized, your reporting accurate and your decisions informed.<br><br>
-                                            From month-end review to budgets and reporting for your board or lenders, we cover what your business needs, when it needs it.
-                                        </p>
-                                        <span class="flip-hint">Details</span>
-                                    </div>
-                                    <div class="card-face card-back">
-                                        <h3>Key Services</h3>
-                                        <ul>
-                                            <li>Part-time financial leadership and decision support.</li>
-                                            <li>Month-end review and reporting oversight.</li>
-                                            <li>Budgeting and financial planning.</li>
-                                            <li>Reporting for owners, boards and lenders.</li>
-                                            <li>Internal controls and accounting process improvements.</li>
-                                            <li>Coordination with your external accountants and auditors.</li>
-                                        </ul>
-                                        <div class="card-outcome"><strong>Outcome</strong>The financial leadership you need, at the scale that fits.</div>
-                                        <p class="back-hint">Click to flip back</p>
-                                    </div>
+                        <div class="panel" role="tabpanel" id="panel-cfo" aria-labelledby="tab-cfo" hidden>
+                            <div class="panel-main">
+                                <h3>Fractional CFO &amp; Accounting Oversight</h3>
+                                <p>Not ready for a full-time CFO? We provide part-time financial leadership to keep your finances organized, your reporting accurate and your decisions informed.</p>
+                                <p>From month-end review to budgets and reporting for your board or lenders, we cover what your business needs, when it needs it.</p>
+                            </div>
+                            <div class="panel-side">
+                                <div class="key-services">
+                                    <h4 class="label">Key Services</h4>
+                                    <ul class="checklist">
+                                        <li>Part-time financial leadership and decision support.</li>
+                                        <li>Month-end review and reporting oversight.</li>
+                                        <li>Budgeting and financial planning.</li>
+                                        <li>Reporting for owners, boards and lenders.</li>
+                                        <li>Internal controls and accounting process improvements.</li>
+                                        <li>Coordination with your external accountants and auditors.</li>
+                                    </ul>
+                                </div>
+                                <div class="outcome">
+                                    <p class="label">Outcome</p>
+                                    <p>The financial leadership you need, at the scale that fits.</p>
                                 </div>
                             </div>
-
                         </div>
                     </div>
-
-                    <button class="carousel-arrow" id="carousel-next" aria-label="Next card">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="9 18 15 12 9 6"/>
-                        </svg>
-                    </button>
                 </div>
-
-                <div class="carousel-dots" id="carousel-dots"></div>
-
             </div>
         </section>
 
-        <section id="roadmap">
-            <div class="section-content section-box">
-                <h2>From Data to Direction: Our 4-Step Roadmap</h2>
-                <!-- <p>Click an icon or use the arrows to explore each step of our process.</p> -->
-
-                <div class="roadmap-layout">
-
-                    <!-- ── Winding Road SVG ────────────────────────── -->
-                    <div class="roadmap-road-wrap">
-                        <svg viewBox="0 0 560 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <defs>
-                                <filter id="road-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                                    <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="rgba(0,0,0,0.45)"/>
-                                </filter>
-                                <linearGradient id="roadGrad" x1="0" y1="0" x2="1" y2="0">
-                                    <stop offset="0%"   stop-color="#1a3a5c"/>
-                                    <stop offset="100%" stop-color="#0d2a47"/>
-                                </linearGradient>
-                            </defs>
-
-                            <!--
-                                S-curve path:
-                                Start bottom-left → arc up to peak (stop 2) → cross midpoint (stop 3) → arc down to right (stop 4)
-                                Stop 1 sits at the start, stop 2 at the top of the first arc,
-                                stop 3 at the valley/midpoint, stop 4 at the end.
-                            -->
-
-                            <!-- Road glow/shadow layer -->
-                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
-                                  fill="none"
-                                  stroke="rgba(0, 102, 204, 0.15)"
-                                  stroke-width="44"
-                                  stroke-linecap="round"
-                                  filter="url(#road-shadow)"/>
-
-                            <!-- Road body -->
-                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
-                                  fill="none"
-                                  stroke="url(#roadGrad)"
-                                  stroke-width="28"
-                                  stroke-linecap="round"/>
-
-                            <!-- Road centre dashes -->
-                            <path d="M 40 230 C 80 230, 160 50, 260 150 C 360 250, 440 70, 520 70"
-                                  fill="none"
-                                  stroke="rgba(255,255,255,0.22)"
-                                  stroke-width="1.5"
-                                  stroke-linecap="round"
-                                  stroke-dasharray="14 10"/>
-
-                            <!-- ── Stop 1: Diagnose — bottom-left start ── -->
-                            <g class="road-stop" data-step="0" transform="translate(40, 230)">
-                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
-                                <image href="../media/Diagnose_Icon.png"
-                                       x="-17" y="-17" width="34" height="34"
-                                       style="filter:invert(1) brightness(0.9)"/>
-                                <text class="stop-label" x="0" y="46">Diagnose</text>
-                            </g>
-
-                            <!-- ── Stop 2: Design — top of first arc ── -->
-                            <g class="road-stop" data-step="1" transform="translate(200, 75)">
-                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
-                                <image href="../media/Model_Icon.png"
-                                       x="-17" y="-17" width="34" height="34"
-                                       style="filter:invert(1) brightness(0.9)"/>
-                                <text class="stop-label" x="0" y="46">Design</text>
-                            </g>
-
-                            <!-- ── Stop 3: Implement — valley between arcs ── -->
-                            <g class="road-stop" data-step="2" transform="translate(320, 205)">
-                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
-                                <image href="../media/Implement_Icon.png"
-                                       x="-17" y="-17" width="34" height="34"
-                                       style="filter:invert(1) brightness(0.9)"/>
-                                <text class="stop-label" x="0" y="46">Implement</text>
-                            </g>
-
-                            <!-- ── Stop 4: Monitor — top-right end ── -->
-                            <g class="road-stop" data-step="3" transform="translate(520, 70)">
-                                <circle class="stop-icon-bg" cx="0" cy="0" r="28"/>
-                                <image href="../media/Monitor_Icon.png"
-                                       x="-17" y="-17" width="34" height="34"
-                                       style="filter:invert(1) brightness(0.9)"/>
-                                <text class="stop-label" x="0" y="46">Monitor</text>
-                            </g>
-                        </svg>
+        <section class="about" id="about">
+            <div class="glow" aria-hidden="true" style="right: -200px; top: 40px; width: 700px; height: 700px; background: radial-gradient(closest-side, rgba(88, 80, 236, 0.22), rgba(5, 8, 15, 0));"></div>
+            <div class="wrap">
+                <div class="about-main reveal-left">
+                    <h2>About Us</h2>
+                    <h3>Who We Are</h3>
+                    <p>We bring actuarial expertise and software development skills under one roof. That gives us a wide range, from analytics and forecasting to performance tracking and custom software, and you work directly with the people solving your challenge.</p>
+                </div>
+                <div class="about-side reveal-right">
+                    <div class="card">
+                        <h3>Our Mission</h3>
+                        <p>To bring practical, data-driven solutions within reach of every business, so they can solve real problems and grow with confidence.</p>
                     </div>
+                    <div class="card">
+                        <h3>How We're Different</h3>
+                        <p>One team, start to finish, held to two standards: the rigour of actuarial work and the quality of well-built tools. The result is solutions you can trust, built to last.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-                    <!-- ── Info Panel + Nav ────────────────────────── -->
-                    <div style="display:flex; flex-direction:column;">
-                    <div class="roadmap-panel" id="roadmap-panel">
-
-                        <!-- Step 1: Diagnose -->
-                        <div class="roadmap-panel-wrap" data-panel="0">
-                        <div class="roadmap-panel-step">
-                            <div class="panel-face panel-front">
-                                <div class="panel-step-header">
-                                    <div class="panel-step-icon"><img src="../media/Diagnose_Icon.png" alt="Diagnose"></div>
-                                    <div class="panel-step-meta">
-                                        <span class="panel-step-num">Step 01</span>
-                                        <span class="panel-step-title">Diagnose</span>
-                                    </div>
-                                </div>
-                                <p class="panel-strategy">
-                                    Every solution starts with the right question. We take the time to understand your business, your data and the challenge you're facing.<br><br>
-                                    Through conversations with your team and a close look at your numbers, we pinpoint what's holding you back and where the biggest opportunities are.
-                                </p>
-                                <span class="panel-flip-hint">Activities</span>
-                            </div>
-                            <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
-                                <ul class="panel-activities">
+        <section class="approach" id="approach">
+            <div class="wrap">
+                <h2 class="section-title reveal">From Data to Direction: Our 4-Step Roadmap</h2>
+                <ol class="steps">
+                    <li class="step">
+                        <div class="step-rail"><span class="step-num">1</span><span class="step-line"></span></div>
+                        <div class="step-body">
+                            <h3>Diagnose</h3>
+                            <p>Every solution starts with the right question. We take the time to understand your business, your data and the challenge you're facing.</p>
+                            <p>Through conversations with your team and a close look at your numbers, we pinpoint what's holding you back and where the biggest opportunities are.</p>
+                            <details class="activities">
+                                <summary>Typical Activities <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                                <ul>
                                     <li>Discussions with your leadership and team.</li>
                                     <li>Review of your data, systems and current reports.</li>
                                     <li>Data quality assessment.</li>
                                     <li>Identification of bottlenecks and opportunities.</li>
                                     <li>Definition of project goals and success measures.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>A clear diagnosis and a focused plan for what comes next.</div>
-                                <p class="panel-back-hint">Click to flip back</p>
-                            </div>
+                                <p class="step-outcome"><span class="label">Outcome</span>A clear diagnosis and a focused plan for what comes next.</p>
+                            </details>
                         </div>
-                        </div><!-- /.roadmap-panel-wrap -->
-
-                        <!-- Step 2: Design -->
-                        <div class="roadmap-panel-wrap" data-panel="1">
-                        <div class="roadmap-panel-step">
-                            <div class="panel-face panel-front">
-                                <div class="panel-step-header">
-                                    <div class="panel-step-icon"><img src="../media/Model_Icon.png" alt="Design"></div>
-                                    <div class="panel-step-meta">
-                                        <span class="panel-step-num">Step 02</span>
-                                        <span class="panel-step-title">Design</span>
-                                    </div>
-                                </div>
-                                <p class="panel-strategy">
-                                    With the problem clearly defined, we design the solution. That could be a forecast, a pricing model, a set of KPIs or a complete application, depending on what your business needs.<br><br>
-                                    We walk you through the approach before anything is built, so there are no surprises along the way.
-                                </p>
-                                <span class="panel-flip-hint">Activities</span>
-                            </div>
-                            <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
-                                <ul class="panel-activities">
+                    </li>
+                    <li class="step">
+                        <div class="step-rail"><span class="step-num">2</span><span class="step-line"></span></div>
+                        <div class="step-body">
+                            <h3>Design</h3>
+                            <p>With the problem clearly defined, we design the solution. That could be a forecast, a pricing model, a set of KPIs or a complete application, depending on what your business needs.</p>
+                            <p>We walk you through the approach before anything is built, so there are no surprises along the way.</p>
+                            <details class="activities">
+                                <summary>Typical Activities <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                                <ul>
                                     <li>Choosing the right approach: analysis, model, dashboard or software.</li>
                                     <li>Solution architecture and data flow design.</li>
                                     <li>Building and testing the analytical foundations.</li>
                                     <li>Documenting key assumptions and decisions.</li>
                                     <li>Reviewing the design with your team.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>A solution designed around your problem, approved before it's built.</div>
-                                <p class="panel-back-hint">Click to flip back</p>
-                            </div>
+                                <p class="step-outcome"><span class="label">Outcome</span>A solution designed around your problem, approved before it's built.</p>
+                            </details>
                         </div>
-                        </div><!-- /.roadmap-panel-wrap -->
-
-                        <!-- Step 3: Implement -->
-                        <div class="roadmap-panel-wrap" data-panel="2">
-                        <div class="roadmap-panel-step">
-                            <div class="panel-face panel-front">
-                                <div class="panel-step-header">
-                                    <div class="panel-step-icon"><img src="../media/Implement_Icon.png" alt="Implement"></div>
-                                    <div class="panel-step-meta">
-                                        <span class="panel-step-num">Step 03</span>
-                                        <span class="panel-step-title">Implement</span>
-                                    </div>
-                                </div>
-                                <p class="panel-strategy">
-                                    This is where the work becomes real. We develop, test and deploy your solution, then walk your team through every part of it.<br><br>
-                                    By the end, you have a tool that works and a team that knows how to use it.
-                                </p>
-                                <span class="panel-flip-hint">Activities</span>
-                            </div>
-                            <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
-                                <ul class="panel-activities">
+                    </li>
+                    <li class="step">
+                        <div class="step-rail"><span class="step-num">3</span><span class="step-line"></span></div>
+                        <div class="step-body">
+                            <h3>Implement</h3>
+                            <p>This is where the work becomes real. We develop, test and deploy your solution, then walk your team through every part of it.</p>
+                            <p>By the end, you have a tool that works and a team that knows how to use it.</p>
+                            <details class="activities">
+                                <summary>Typical Activities <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                                <ul>
                                     <li>Development of applications, dashboards and automated processes.</li>
                                     <li>Integration with your existing systems and data.</li>
                                     <li>Testing with the people who will use the solution.</li>
                                     <li>Deployment into your day-to-day operations.</li>
                                     <li>Training and documentation for your team.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>Real results, delivered and ready to run.</div>
-                                <p class="panel-back-hint">Click to flip back</p>
-                            </div>
+                                <p class="step-outcome"><span class="label">Outcome</span>Real results, delivered and ready to run.</p>
+                            </details>
                         </div>
-                        </div><!-- /.roadmap-panel-wrap -->
-
-                        <!-- Step 4: Monitor -->
-                        <div class="roadmap-panel-wrap" data-panel="3">
-                        <div class="roadmap-panel-step">
-                            <div class="panel-face panel-front">
-                                <div class="panel-step-header">
-                                    <div class="panel-step-icon"><img src="../media/Monitor_Icon.png" alt="Monitor"></div>
-                                    <div class="panel-step-meta">
-                                        <span class="panel-step-num">Step 04</span>
-                                        <span class="panel-step-title">Monitor</span>
-                                    </div>
-                                </div>
-                                <p class="panel-strategy">
-                                    Delivery is only the beginning. We keep an eye on performance, catch issues early and fine-tune the solution as your business grows.<br><br>
-                                    You get ongoing support from the same team that built it.
-                                </p>
-                                <span class="panel-flip-hint">Activities</span>
-                            </div>
-                            <div class="panel-face panel-back">
-                                <p class="panel-section-label">Typical Activities</p>
-                                <ul class="panel-activities">
+                    </li>
+                    <li class="step">
+                        <div class="step-rail"><span class="step-num">4</span><span class="step-line"></span></div>
+                        <div class="step-body">
+                            <h3>Monitor</h3>
+                            <p>Delivery is only the beginning. We keep an eye on performance, catch issues early and fine-tune the solution as your business grows.</p>
+                            <p>You get ongoing support from the same team that built it.</p>
+                            <details class="activities">
+                                <summary>Typical Activities <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                                <ul>
                                     <li>Tracking results against actual performance.</li>
                                     <li>Updates and adjustments as your business changes.</li>
                                     <li>Early detection of issues and emerging risks.</li>
                                     <li>Periodic reviews with your leadership team.</li>
                                     <li>Ongoing support and improvements.</li>
                                 </ul>
-                                <div class="panel-outcome"><strong>Outcome</strong>Lasting results, backed by a team that stays involved.</div>
-                                <p class="panel-back-hint">Click to flip back</p>
-                            </div>
+                                <p class="step-outcome"><span class="label">Outcome</span>Lasting results, backed by a team that stays involved.</p>
+                            </details>
                         </div>
-                        </div><!-- /.roadmap-panel-wrap -->
+                    </li>
+                </ol>
+            </div>
+        </section>
 
-                    </div><!-- /.roadmap-panel -->
+        <section class="work" id="work">
+            <div class="glow" aria-hidden="true" style="left: -260px; top: 280px; width: 760px; height: 760px; background: radial-gradient(closest-side, rgba(0, 153, 215, 0.2), rgba(5, 8, 15, 0));"></div>
+            <div class="wrap">
+                <div class="centered-intro reveal">
+                    <h2 class="section-title">Our Work in Action</h2>
+                    <p>Real problems we've solved for our clients, shared with their privacy in mind.</p>
+                </div>
 
-                    <!-- Nav arrows sit below the panel, outside it -->
-                    <div class="roadmap-nav">
-                        <button class="roadmap-arrow" id="roadmap-prev" aria-label="Previous step">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <span class="roadmap-nav-counter" id="roadmap-counter">1 / 4</span>
-                        <button class="roadmap-arrow" id="roadmap-next" aria-label="Next step">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-                        </button>
+                <article class="project">
+                    <div class="project-text reveal">
+                        <h3>Road data collection and management software for municipalities</h3>
+                        <p>We built an application that turns raw road survey data into clear recommendations for an engineering firm. Automated anomaly detection cut manual review by 90% and reduced errors in field data, and every setting can be adapted to each municipality's needs.</p>
                     </div>
-                    </div><!-- /.panel+nav column -->
-                </div><!-- /.roadmap-layout -->
+                    <div class="project-visual parallax" aria-hidden="true">
+                        <svg viewBox="0 0 520 300">
+                            <path d="M20,250 C140,250 150,90 270,110 S410,260 500,60" fill="none" stroke="#1B263B" stroke-width="22" stroke-linecap="round"/>
+                            <path d="M20,250 C140,250 150,90 270,110 S410,260 500,60" fill="none" stroke="#33B5EA" stroke-width="3" stroke-dasharray="26 10" stroke-linecap="round"/>
+                            <circle cx="176" cy="150" r="7" fill="#F2A93B"/><circle cx="176" cy="150" r="16" fill="none" stroke="#F2A93B" stroke-width="1.5" opacity="0.6"/>
+                            <circle cx="372" cy="186" r="7" fill="#F2A93B"/><circle cx="372" cy="186" r="16" fill="none" stroke="#F2A93B" stroke-width="1.5" opacity="0.6"/>
+                            <rect x="330" y="26" width="160" height="10" rx="5" fill="#18233A"/><rect x="330" y="46" width="110" height="10" rx="5" fill="#18233A"/>
+                        </svg>
+                    </div>
+                </article>
+
+                <article class="project flip">
+                    <div class="project-visual parallax" aria-hidden="true">
+                        <svg viewBox="0 0 520 300">
+                            <rect x="20" y="40" width="44" height="150" rx="6" fill="#33B5EA"/>
+                            <rect x="80" y="70" width="44" height="120" rx="6" fill="#2A88B8"/>
+                            <rect x="140" y="95" width="44" height="95" rx="6" fill="#256F96"/>
+                            <rect x="200" y="120" width="44" height="70" rx="6" fill="#215A79"/>
+                            <rect x="260" y="160" width="44" height="30" rx="6" fill="#F2A93B"/>
+                            <line x1="20" y1="200" x2="304" y2="200" stroke="#2A364C" stroke-width="1"/>
+                            <rect x="340" y="40" width="160" height="38" rx="8" fill="#111A2B"/><circle cx="358" cy="59" r="5" fill="#F2A93B"/><rect x="372" y="54" width="100" height="10" rx="5" fill="#2A364C"/>
+                            <rect x="340" y="88" width="160" height="38" rx="8" fill="#111A2B"/><circle cx="358" cy="107" r="5" fill="#F2A93B"/><rect x="372" y="102" width="80" height="10" rx="5" fill="#2A364C"/>
+                            <rect x="340" y="136" width="160" height="38" rx="8" fill="#111A2B"/><circle cx="358" cy="155" r="5" fill="#33B5EA"/><rect x="372" y="150" width="110" height="10" rx="5" fill="#2A364C"/>
+                            <rect x="20" y="226" width="480" height="44" rx="10" fill="#111A2B"/><rect x="38" y="243" width="190" height="10" rx="5" fill="#2A364C"/><rect x="400" y="240" width="82" height="16" rx="8" fill="#33B5EA" opacity="0.5"/>
+                        </svg>
+                    </div>
+                    <div class="project-text reveal">
+                        <h3>Live sales dashboard for a distributor and manufacturer</h3>
+                        <p>Which products are selling? Which customers have stopped reordering? Which backorders come first? Our live dashboard answers all three at a glance, giving the sales team a clear list of customers to call for feedback and new orders.</p>
+                    </div>
+                </article>
+
+                <article class="project">
+                    <div class="project-text reveal">
+                        <h3>Advisor performance tracking for a call center</h3>
+                        <p>Our custom metrics gave managers a clear, fair view of every advisor's performance, from closing ratios to handling time. The result: targeted coaching that narrowed the gap between the best and worst performer by about a third in six months.</p>
+                    </div>
+                    <div class="project-visual parallax" aria-hidden="true">
+                        <svg viewBox="0 0 520 300">
+                            <line x1="20" y1="60" x2="500" y2="60" stroke="#18233A" stroke-width="1"/>
+                            <line x1="20" y1="140" x2="500" y2="140" stroke="#18233A" stroke-width="1"/>
+                            <line x1="20" y1="220" x2="500" y2="220" stroke="#18233A" stroke-width="1"/>
+                            <path d="M20,70 C140,66 260,74 500,72 L500,150 C320,168 180,215 20,240 Z" fill="rgba(51, 181, 234, 0.12)"/>
+                            <path d="M20,70 C140,66 260,74 500,72" fill="none" stroke="#33B5EA" stroke-width="3" stroke-linecap="round"/>
+                            <path d="M20,240 C180,215 320,168 500,150" fill="none" stroke="#F2A93B" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="500" cy="72" r="6" fill="#33B5EA"/><circle cx="500" cy="150" r="6" fill="#F2A93B"/>
+                            <line x1="20" y1="270" x2="500" y2="270" stroke="#2A364C" stroke-width="1"/>
+                        </svg>
+                    </div>
+                </article>
             </div>
         </section>
 
-        <section id="projects">
-            <div class="section-content section-box">
-                <h2>Our Work in Action</h2>
-                <p>Real problems we've solved for our clients, shared with their privacy in mind.</p>
-
-                <div class="about-block">
-                    <h3>Road data collection and management software for municipalities</h3>
-                    <p>
-                        We built an application that turns raw road survey data into clear recommendations for an engineering firm.
-                        Automated anomaly detection cut manual review by 90% and reduced errors in field data,
-                        and every setting can be adapted to each municipality's needs.
-                    </p>
-                </div>
-
-                <div class="about-block">
-                    <h3>Live sales dashboard for a distributor and manufacturer</h3>
-                    <p>
-                        Which products are selling? Which customers have stopped reordering? Which backorders come first?
-                        Our live dashboard answers all three at a glance, giving the sales team a clear list of customers to call for feedback and new orders.
-                    </p>
-                </div>
-
-                <div class="about-block">
-                    <h3>Advisor performance tracking for a call center</h3>
-                    <p>
-                        Our custom metrics gave managers a clear, fair view of every advisor's performance, from closing ratios to handling time.
-                        The result: targeted coaching that narrowed the gap between the best and worst performer by about a third in six months.
-                    </p>
-                </div>
-            </div>
-        </section>
-
-        <section id="contact">
-            <div class="section-content section-box">
+        <section class="contact" id="contact">
+            <div class="glow" aria-hidden="true" style="left: 50%; bottom: -320px; width: 1000px; height: 700px; margin-left: -500px; background: radial-gradient(closest-side, rgba(88, 80, 236, 0.26), rgba(0, 153, 215, 0.12) 55%, rgba(5, 8, 15, 0));"></div>
+            <div class="wrap reveal">
                 <h2>Let's change the game together</h2>
                 <p>Have a challenge in mind? Tell us about it and let's get started.</p>
-                
-                <div class="contact-form">
-                    <form action="https://formspree.io/f/xgolevlg" method="POST">
-                        <div class="form-group">
+                <form class="contact-form" action="https://formspree.io/f/xgolevlg" method="POST">
+                    <div class="form-row">
+                        <div class="field">
                             <label for="name">Name</label>
-                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                            <input type="text" id="name" name="name" placeholder="Your name" autocomplete="name" required>
                         </div>
-                        
-                        <div class="form-group">
+                        <div class="field">
                             <label for="email">Email</label>
-                            <input type="email" id="email" name="email" placeholder="your.email@example.com" required>
+                            <input type="email" id="email" name="email" placeholder="your.email@example.com" autocomplete="email" required>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="button_3">Send Message</button>
-                    </form>
-                </div>
+                    </div>
+                    <div class="field">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" placeholder="Tell us about your project..." required></textarea>
+                    </div>
+                    <button type="submit">Send Message</button>
+                </form>
             </div>
         </section>
     </main>
 
+    <footer class="site-footer">
+        <div class="wrap">
+            <img src="../media/Laplace-solutions_logo_blanc.svg" alt="Laplace Solutions">
+            <span>&copy; 2026 Laplace Solutions</span>
+        </div>
+    </footer>
+
     <script>
         /* =====================================================================
-           VIDEO CONFIGURATION
-           Set the filename for each section's background video here.
-           All files are resolved from the media_folder_path below.
+           SERVICE TABS
            ===================================================================== */
-        const media_folder_path = '../media';
+        (function () {
+            const tabs = Array.from(document.querySelectorAll('.tab'));
 
-        const sectionVideos = {
-            home: 'Sample_5.mp4',
-        };
-
-        // Inject src attributes into each video source element
-        Object.entries(sectionVideos).forEach(([sectionId, filename]) => {
-            const sourceEl = document.getElementById(`${sectionId}-video-source`);
-            if (sourceEl) {
-                sourceEl.src = `${media_folder_path}/${filename}`;
-                sourceEl.closest('video').load();
+            function select(tab, focus) {
+                tabs.forEach(t => {
+                    const on = t === tab;
+                    t.setAttribute('aria-selected', on ? 'true' : 'false');
+                    t.tabIndex = on ? 0 : -1;
+                    const panel = document.getElementById(t.getAttribute('aria-controls'));
+                    panel.hidden = !on;
+                    if (on) {
+                        panel.classList.remove('is-entering');
+                        void panel.offsetWidth; // restart the short fade-in
+                        panel.classList.add('is-entering');
+                    }
+                });
+                if (focus) tab.focus();
+                tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
             }
-        });
 
-        /* =====================================================================
-           NAVIGATION & SCROLLING
-           ===================================================================== */
-        const navWidgets = document.querySelectorAll('.nav-widget');
-        const sections = document.querySelectorAll('section');
-        const header = document.querySelector('header');
-        const langSwitch = document.getElementById('lang-switch');
-
-        // Smooth scroll implementation
-        navWidgets.forEach(widget => {
-            widget.addEventListener('click', () => {
-                const targetId = widget.getAttribute('data-target');
-                const targetSection = document.getElementById(targetId);
-                targetSection.scrollIntoView({ behavior: 'smooth' });
+            tabs.forEach((tab, i) => {
+                tab.addEventListener('click', () => select(tab, false));
+                tab.addEventListener('keydown', e => {
+                    if (e.key === 'ArrowRight') { e.preventDefault(); select(tabs[(i + 1) % tabs.length], true); }
+                    if (e.key === 'ArrowLeft') { e.preventDefault(); select(tabs[(i - 1 + tabs.length) % tabs.length], true); }
+                });
             });
-        });
+        })();
 
         /* =====================================================================
-           DYNAMIC HEADER STYLING — disabled for now
-           Toggles header background based on scroll depth.
+           HERO VIDEO: pause it for visitors who prefer reduced motion
            ===================================================================== */
-        /* window.addEventListener('scroll', () => {
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop === 0) {
-                header.style.backgroundColor = 'rgba(255, 255, 255, 0)';
-                navWidgets.forEach(widget => widget.classList.remove('scrolled'));
-                langSwitch.classList.remove('scrolled');
+        (function () {
+            const video = document.querySelector('.hero-video video');
+            if (!video) return;
+            video.muted = true;
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                video.removeAttribute('autoplay');
+                video.pause();
             } else {
-                header.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-                navWidgets.forEach(widget => widget.classList.add('scrolled'));
-                langSwitch.classList.add('scrolled');
+                const p = video.play();
+                if (p && p.catch) p.catch(() => {});
             }
-        }); */
-
-        /* =====================================================================
-           ACTIVE SECTION TRACKING — updates nav highlight as user scrolls
-           ===================================================================== */
-        const observerOptions = {
-            root: null,
-            threshold: 0.5
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const targetId = entry.target.id;
-                    navWidgets.forEach(widget => {
-                        widget.classList.toggle('active', widget.getAttribute('data-target') === targetId);
-                    });
-                }
-            });
-        }, observerOptions);
-
-        // Register all sections with the observer
-        sections.forEach(section => observer.observe(section));
-
-        /* =====================================================================
-           HAMBURGER MENU
-           ===================================================================== */
-        const hamburger = document.getElementById('hamburger');
-        const headerMiddle = document.querySelector('.header-middle');
-
-        hamburger.addEventListener('click', () => {
-            hamburger.classList.toggle('open');
-            headerMiddle.classList.toggle('open');
-        });
-
-        // Close menu when a nav item is clicked
-        navWidgets.forEach(widget => {
-            widget.addEventListener('click', () => {
-                hamburger.classList.remove('open');
-                headerMiddle.classList.remove('open');
-            });
-        });
-
-        // Update hamburger span colour on scroll — disabled for now
-        // window.addEventListener('scroll', () => {
-        //     const scrolled = (window.pageYOffset || document.documentElement.scrollTop) > 0;
-        //     hamburger.classList.toggle('scrolled', scrolled);
-        // });
-
-        /* =====================================================================
-           ROADMAP INTERACTION — click / keyboard navigation
-           ===================================================================== */
-        (function () {
-            const stops    = document.querySelectorAll('.road-stop');
-            const wraps    = document.querySelectorAll('.roadmap-panel-wrap');
-            const panelBox = document.getElementById('roadmap-panel');
-            const prevBtn  = document.getElementById('roadmap-prev');
-            const nextBtn  = document.getElementById('roadmap-next');
-            const counter  = document.getElementById('roadmap-counter');
-            const total    = stops.length;
-            let current    = 0;
-
-            // Helper: get the inner flip element from a wrap
-            function stepOf(wrap) { return wrap.querySelector('.roadmap-panel-step'); }
-
-            // Pre-set all wrappers: first visible, rest hidden
-            wraps.forEach((w, i) => {
-                w.style.display = i === 0 ? 'block' : 'none';
-                w.style.opacity = i === 0 ? '1'     : '0';
-            });
-
-            // Panel box needs relative positioning to contain absolute children
-            panelBox.style.position = 'relative';
-
-            function goTo(idx) {
-                if (idx === current) return;
-                const prev = current;
-                current = Math.max(0, Math.min(idx, total - 1));
-
-                // Swap active stop markers
-                stops.forEach((s, i) => s.classList.toggle('active', i === current));
-
-                const outWrap = wraps[prev];
-                const inWrap  = wraps[current];
-
-                // Fade out the WRAPPER (opacity never touches preserve-3d element,
-                // so the 3D context stays intact and no flip artifact appears).
-                outWrap.style.transition = 'opacity 0.22s ease';
-                outWrap.style.opacity    = '0';
-
-                setTimeout(() => {
-                    // Panel is invisible — silently reset flip on inner step
-                    stepOf(outWrap).classList.remove('panel-flipped');
-                    outWrap.style.display = 'none';
-
-                    // Show incoming wrapper on front face, then fade in
-                    stepOf(inWrap).classList.remove('panel-flipped');
-                    inWrap.style.transition = 'none';
-                    inWrap.style.opacity    = '0';
-                    inWrap.style.display    = 'block';
-
-                    requestAnimationFrame(() => requestAnimationFrame(() => {
-                        inWrap.style.transition = 'opacity 0.28s ease';
-                        inWrap.style.opacity    = '1';
-                    }));
-                }, 230);
-
-                counter.textContent = `${current + 1} / ${total}`;
-                prevBtn.disabled    = current === 0;
-                nextBtn.disabled    = current === total - 1;
-            }
-
-            // Flip the inner step element on click (not the wrapper)
-            panelBox.addEventListener('click', () => {
-                stepOf(wraps[current]).classList.toggle('panel-flipped');
-            });
-
-            // Initialise
-            stops.forEach((s, i) => s.classList.toggle('active', i === 0));
-            prevBtn.disabled = true;
-
-            // Click a road stop icon
-            stops.forEach((stop, i) => {
-                stop.addEventListener('click', e => {
-                    e.stopPropagation(); // don't bubble to panelBox
-                    goTo(i);
-                });
-            });
-
-            // Arrow buttons
-            prevBtn.addEventListener('click', () => goTo(current - 1));
-            nextBtn.addEventListener('click', () => goTo(current + 1));
-
-            // Keyboard arrows when roadmap section is in view
-            document.addEventListener('keydown', e => {
-                const roadmap = document.getElementById('roadmap');
-                const rect    = roadmap.getBoundingClientRect();
-                if (rect.top >= window.innerHeight || rect.bottom <= 0) return;
-                if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
-                if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
-            });
         })();
 
         /* =====================================================================
-           EXPERTISE CAROUSEL
+           SCROLL MOTION FALLBACK
+           Browsers with CSS scroll timelines (Chrome, Edge, recent Safari) run
+           the effects natively from the stylesheet. Others get them here.
            ===================================================================== */
         (function () {
-            const grid      = document.getElementById('expertise-grid');
-            const prevBtn   = document.getElementById('carousel-prev');
-            const nextBtn   = document.getElementById('carousel-next');
-            const dotsWrap  = document.getElementById('carousel-dots');
-            const cards     = Array.from(grid.querySelectorAll('.expertise-card'));
-            const total     = cards.length;
-            let current     = 0;
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const native = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
+            if (reduce || native) return;
 
-            // Build dot indicators
-            cards.forEach((_, i) => {
-                const dot = document.createElement('button');
-                dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-                dot.setAttribute('aria-label', `Go to card ${i + 1}`);
-                dot.addEventListener('click', () => goTo(i));
-                dotsWrap.appendChild(dot);
-            });
+            const items = Array.from(document.querySelectorAll('.hero-copy, .hero-video, .reveal, .reveal-scale, .reveal-left, .reveal-right, .step, .parallax'));
+            const hero = document.querySelector('.hero');
+            const clamp = v => (v < 0 ? 0 : v > 1 ? 1 : v);
+            let pending = false;
 
-            function getCardWidth() {
-                // Full width of one card + gap
-                const gap = parseInt(getComputedStyle(grid).gap) || 32;
-                return cards[0].offsetWidth + gap;
-            }
+            function tick() {
+                pending = false;
+                const vh = window.innerHeight;
+                const hr = hero.getBoundingClientRect();
+                const exit = clamp(-hr.top / hr.height);
 
-            function updateCarousel() {
-                const cardW = getCardWidth();
-
-                // Centre the active card inside the track wrapper
-                const wrapperW = grid.parentElement.offsetWidth;
-                const offset   = (wrapperW / 2) - (cards[0].offsetWidth / 2) - (current * cardW);
-                grid.style.transform = `translateX(${offset}px)`;
-
-                // State classes
-                cards.forEach((card, i) => {
-                    card.classList.remove('carousel-active', 'carousel-prev', 'carousel-next');
-                    if (i === current)           card.classList.add('carousel-active');
-                    else if (i === current - 1)  card.classList.add('carousel-prev');
-                    else if (i === current + 1)  card.classList.add('carousel-next');
-                    else {
-                        // Cards further away: treat like prev/next for styling
-                        card.classList.add(i < current ? 'carousel-prev' : 'carousel-next');
+                items.forEach(n => {
+                    const cl = n.classList;
+                    if (cl.contains('hero-video')) { n.style.opacity = String(1 - exit); return; }
+                    if (cl.contains('hero-copy')) {
+                        n.style.opacity = String(1 - exit);
+                        n.style.transform = `translateY(${-70 * exit}px) scale(${1 - 0.06 * exit})`;
+                        return;
                     }
-
-                    // Unflip non-active cards when navigating away
-                    if (i !== current) card.classList.remove('flipped');
-                });
-
-                // Update dots
-                dotsWrap.querySelectorAll('.carousel-dot').forEach((dot, i) => {
-                    dot.classList.toggle('active', i === current);
-                });
-
-                // Arrow disabled states — always enabled for looping
-                prevBtn.disabled = false;
-                nextBtn.disabled = false;
-            }
-
-            // Make every card tall enough for its longest face (front or back) at the current width
-            function fitCardHeights() {
-                let tallest = 0;
-                cards.forEach(card => {
-                    card.querySelectorAll('.card-face').forEach(face => {
-                        const cs = getComputedStyle(face);
-                        let h = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom);
-                        Array.from(face.children).forEach(child => {
-                            const ccs = getComputedStyle(child);
-                            if (ccs.position === 'absolute') return;
-                            h += child.getBoundingClientRect().height + parseFloat(ccs.marginTop) + parseFloat(ccs.marginBottom);
-                        });
-                        tallest = Math.max(tallest, h + 24); // room for the "Details" hint
-                    });
-                });
-                cards.forEach(card => {
-                    card.style.minHeight = tallest + 'px';
-                    card.querySelector('.card-inner').style.minHeight = tallest + 'px';
-                });
-            }
-
-            function goTo(index) {
-                // Wrap around for infinite loop
-                current = ((index % total) + total) % total;
-                updateCarousel();
-            }
-
-            // Flip only the active card on click
-            cards.forEach(card => {
-                card.addEventListener('click', () => {
-                    if (card.classList.contains('carousel-active')) {
-                        card.classList.toggle('flipped');
+                    const r = n.getBoundingClientRect();
+                    if (cl.contains('parallax')) {
+                        const q = clamp((vh - r.top) / (vh + r.height));
+                        n.style.transform = `translateY(${70 - 140 * q}px) scale(${0.95 + 0.05 * q})`;
+                        return;
+                    }
+                    const p = clamp((vh * 0.95 - r.top) / (vh * 0.35));
+                    if (cl.contains('reveal-scale')) {
+                        n.style.opacity = String(0.15 + 0.85 * p);
+                        n.style.transform = `translateY(${70 * (1 - p)}px) scale(${0.88 + 0.12 * p})`;
+                    } else if (cl.contains('reveal-left')) {
+                        n.style.opacity = String(p);
+                        n.style.transform = `translateX(${-64 * (1 - p)}px)`;
+                    } else if (cl.contains('reveal-right')) {
+                        n.style.opacity = String(p);
+                        n.style.transform = `translateX(${64 * (1 - p)}px)`;
+                    } else if (cl.contains('step')) {
+                        n.style.opacity = String(0.12 + 0.88 * p);
+                        n.style.transform = `translateX(${36 * (1 - p)}px)`;
+                    } else {
+                        n.style.opacity = String(p);
+                        n.style.transform = `translateY(${48 * (1 - p)}px)`;
                     }
                 });
-            });
+            }
 
-            prevBtn.addEventListener('click', () => goTo(current - 1));
-            nextBtn.addEventListener('click', () => goTo(current + 1));
-
-            // Keyboard navigation when focused within the carousel
-            document.addEventListener('keydown', e => {
-                const inCarousel = document.activeElement.closest('.expertise-carousel');
-                if (!inCarousel && document.activeElement.tagName !== 'BODY') return;
-                if (e.key === 'ArrowLeft')  { e.preventDefault(); goTo(current - 1); }
-                if (e.key === 'ArrowRight') { e.preventDefault(); goTo(current + 1); }
-            });
-
-            // Touch/swipe support
-            let touchStartX = 0;
-            grid.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-            grid.addEventListener('touchend', e => {
-                const diff = touchStartX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 40) goTo(diff > 0 ? current + 1 : current - 1);
-            });
-
-            // Recalculate on resize
-            window.addEventListener('resize', () => { fitCardHeights(); updateCarousel(); });
-
-            // Initial render (slight delay to ensure layout is ready)
-            setTimeout(() => { fitCardHeights(); updateCarousel(); }, 50);
-            window.addEventListener('load', () => { fitCardHeights(); updateCarousel(); });
+            const onScroll = () => { if (!pending) { pending = true; requestAnimationFrame(tick); } };
+            window.addEventListener('scroll', onScroll, { passive: true });
+            window.addEventListener('resize', onScroll);
+            tick();
         })();
-
-        /* =====================================================================
-           SKIP VIDEO LOADING ON MOBILE (saves bandwidth & battery)
-           ===================================================================== */
-        if (window.innerWidth <= 768) {
-            document.querySelectorAll('.section-bg video').forEach(v => {
-                v.removeAttribute('autoplay');
-                v.pause();
-            });
-        }
     </script>
-    
+
     <script src="../js/lang-switch.js"></script>
 </body>
 </html>
