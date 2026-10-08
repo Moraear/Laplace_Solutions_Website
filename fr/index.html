@@ -77,9 +77,7 @@
             position: sticky;
             top: 0;
             z-index: 20;
-            background: rgba(5, 8, 15, 0.78);
-            -webkit-backdrop-filter: blur(14px);
-            backdrop-filter: blur(14px);
+            background: rgba(5, 8, 15, 0.9);
             border-bottom: 1px solid var(--line);
         }
 
@@ -1088,7 +1086,9 @@
                     }
                 });
                 if (focus) tab.focus();
-                tab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+                const bar = tab.parentElement;
+                const left = tab.offsetLeft - (bar.clientWidth - tab.offsetWidth) / 2;
+                bar.scrollTo({ left: Math.max(0, left), behavior: 'smooth' });
             }
 
             tabs.forEach((tab, i) => {
@@ -1111,8 +1111,14 @@
                 video.removeAttribute('autoplay');
                 video.pause();
             } else {
-                const p = video.play();
-                if (p && p.catch) p.catch(() => {});
+                const play = () => { const p = video.play(); if (p && p.catch) p.catch(() => {}); };
+                play();
+                // Stop decoding video while the hero is off screen
+                if ('IntersectionObserver' in window) {
+                    new IntersectionObserver(entries => {
+                        entries.forEach(e => (e.isIntersecting ? play() : video.pause()));
+                    }).observe(document.querySelector('.hero'));
+                }
             }
         })();
 
@@ -1129,48 +1135,60 @@
             const items = Array.from(document.querySelectorAll('.hero-copy, .hero-video, .reveal, .reveal-scale, .reveal-left, .reveal-right, .step, .parallax, .exit-fade, .glow-grow, .line-draw'));
             const hero = document.querySelector('.hero');
             const clamp = v => (v < 0 ? 0 : v > 1 ? 1 : v);
-            let pending = false;
+
+            // Page positions are measured from layout (offsetTop), which ignores the transforms this
+            // script applies, so moving an element never feeds back into how far it should move.
+            const pageTop = el => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return y; };
+            let boxes = [];
+            let heroBox = { top: 0, height: 1 };
+
+            function measure() {
+                heroBox = { top: pageTop(hero), height: hero.offsetHeight || 1 };
+                boxes = items.map(n => {
+                    const host = n.classList.contains('glow-grow') || n.classList.contains('line-draw') ? n.parentNode : n;
+                    return { n, cl: n.classList, top: pageTop(host), height: host.offsetHeight || 1 };
+                });
+            }
 
             function tick() {
                 pending = false;
                 const vh = window.innerHeight;
-                const hr = hero.getBoundingClientRect();
-                const exit = clamp(-hr.top / hr.height);
+                const y = window.scrollY;
+                const exit = clamp((y - heroBox.top) / heroBox.height);
 
-                items.forEach(n => {
-                    const cl = n.classList;
+                // Only writes from here on: no layout reads inside the loop
+                boxes.forEach(({ n, cl, top, height }) => {
+                    const rTop = top - y;
                     if (cl.contains('hero-video')) { n.style.opacity = String(1 - exit); return; }
                     if (cl.contains('hero-copy')) {
                         n.style.opacity = String(1 - exit);
                         n.style.transform = `translateY(${-70 * exit}px) scale(${1 - 0.06 * exit})`;
                         return;
                     }
-                    const r = n.getBoundingClientRect();
                     if (cl.contains('exit-fade')) {
-                        const x = clamp(-r.top / r.height);
+                        const x = clamp(-rTop / height);
                         n.style.opacity = String(1 - 0.75 * x);
                         n.style.transform = `scale(${1 - 0.04 * x})`;
                         return;
                     }
-                    if (cl.contains('glow-grow') || cl.contains('line-draw')) {
-                        const host = n.parentNode.getBoundingClientRect();
-                        if (cl.contains('line-draw')) {
-                            const g = clamp((vh - host.top) / (vh * 0.4));
-                            n.style.opacity = String(g);
-                            n.style.transform = `scaleX(${g})`;
-                        } else {
-                            const g = clamp((vh - host.top) / (vh * 0.9));
-                            n.style.opacity = String(0.2 + 0.8 * g);
-                            n.style.transform = `scale(${0.55 + 0.55 * g})`;
-                        }
+                    if (cl.contains('line-draw')) {
+                        const g = clamp((vh - rTop) / (vh * 0.4));
+                        n.style.opacity = String(g);
+                        n.style.transform = `scaleX(${g})`;
+                        return;
+                    }
+                    if (cl.contains('glow-grow')) {
+                        const g = clamp((vh - rTop) / (vh * 0.9));
+                        n.style.opacity = String(0.2 + 0.8 * g);
+                        n.style.transform = `scale(${0.55 + 0.55 * g})`;
                         return;
                     }
                     if (cl.contains('parallax')) {
-                        const q = clamp((vh - r.top) / (vh + r.height));
+                        const q = clamp((vh - rTop) / (vh + height));
                         n.style.transform = `translateY(${70 - 140 * q}px) scale(${0.95 + 0.05 * q})`;
                         return;
                     }
-                    const p = clamp((vh * (cl.contains('reveal-late') ? 0.9 : 0.95) - r.top) / (vh * 0.35));
+                    const p = clamp((vh * (cl.contains('reveal-late') ? 0.9 : 0.95) - rTop) / (vh * 0.35));
                     if (cl.contains('reveal-scale')) {
                         n.style.opacity = String(0.15 + 0.85 * p);
                         n.style.transform = `translateY(${70 * (1 - p)}px) scale(${0.88 + 0.12 * p})`;
@@ -1190,10 +1208,17 @@
                 });
             }
 
-            const onScroll = () => { if (!pending) { pending = true; requestAnimationFrame(tick); } };
-            window.addEventListener('scroll', onScroll, { passive: true });
-            window.addEventListener('resize', onScroll);
-            tick();
+            let pending = false;
+            const schedule = () => { if (!pending) { pending = true; requestAnimationFrame(tick); } };
+            const remeasure = () => { measure(); schedule(); };
+
+            window.addEventListener('scroll', schedule, { passive: true });
+            window.addEventListener('resize', remeasure);
+            window.addEventListener('load', remeasure);
+            // Re-measure when content changes height: switching service tabs, opening activities, fonts loading
+            if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(document.querySelector('main'));
+            document.addEventListener('toggle', remeasure, true);
+            remeasure();
         })();
     </script>
 
