@@ -449,7 +449,18 @@
         /* ==========================================================================
            CONTACT & FOOTER
            ========================================================================== */
-        .contact { position: relative; padding: 120px 28px; border-top: 1px solid var(--line); overflow: hidden; }
+        .contact { position: relative; padding: 120px 28px; border-top: 1px solid var(--line); overflow: clip; }
+
+        .contact-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(51, 181, 234, 0), #33B5EA 30%, #8C84FF 50%, #33B5EA 70%, rgba(51, 181, 234, 0));
+            box-shadow: 0 0 18px rgba(51, 181, 234, 0.55);
+            transform-origin: center;
+        }
 
         .contact .wrap { position: relative; max-width: 720px; text-align: center; }
 
@@ -522,6 +533,11 @@
                 .reveal-right { animation: reveal-right linear both; animation-timeline: view(); animation-range: entry 10% cover 35%; }
                 .step { animation: step-in linear both; animation-timeline: view(); animation-range: entry 15% cover 40%; }
                 .parallax { animation: parallax linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+                .reveal-late { animation-range: entry 15% cover 45%; }
+                .exit-fade { animation: exit-fade linear both; animation-timeline: view(); animation-range: exit 0% exit 100%; }
+                .contact { view-timeline-name: --contact; }
+                .glow-grow { animation: glow-grow linear both; animation-timeline: --contact; animation-range: entry 0% cover 50%; }
+                .line-draw { animation: line-draw linear both; animation-timeline: --contact; animation-range: entry 0% entry 70%; }
             }
         }
 
@@ -532,6 +548,9 @@
         @keyframes reveal-left { from { opacity: 0; transform: translateX(-64px); } to { opacity: 1; transform: none; } }
         @keyframes reveal-right { from { opacity: 0; transform: translateX(64px); } to { opacity: 1; transform: none; } }
         @keyframes step-in { from { opacity: 0.12; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+        @keyframes exit-fade { to { opacity: 0.25; transform: scale(0.96); } }
+        @keyframes glow-grow { from { opacity: 0.2; transform: scale(0.55); } to { opacity: 1; transform: scale(1.1); } }
+        @keyframes line-draw { from { transform: scaleX(0); opacity: 0; } to { transform: scaleX(1); opacity: 1; } }
         @keyframes parallax { from { transform: translateY(70px) scale(0.95); } to { transform: translateY(-70px) scale(1); } }
 
         @media (prefers-reduced-motion: reduce) {
@@ -994,7 +1013,7 @@
                     </div>
                 </article>
 
-                <article class="project">
+                <article class="project exit-fade">
                     <div class="project-text reveal">
                         <h3>Suivi du rendement des conseillers pour un centre d'appels</h3>
                         <p>Nos indicateurs sur mesure ont donné aux gestionnaires une vue claire et équitable du rendement de chaque conseiller, du taux de conclusion au temps de traitement. Le résultat : un accompagnement ciblé qui a réduit d'environ un tiers, en six mois, l'écart entre le conseiller le plus performant et le moins performant.</p>
@@ -1015,11 +1034,12 @@
         </section>
 
         <section class="contact" id="contact">
-            <div class="glow" aria-hidden="true" style="left: 50%; bottom: -320px; width: 1000px; height: 700px; margin-left: -500px; background: radial-gradient(closest-side, rgba(88, 80, 236, 0.26), rgba(0, 153, 215, 0.12) 55%, rgba(5, 8, 15, 0));"></div>
-            <div class="wrap reveal">
-                <h2>Changeons la donne ensemble</h2>
-                <p>Vous avez un défi en tête? Parlez-nous-en et lançons-nous.</p>
-                <form class="contact-form" action="https://formspree.io/f/xgolevlg" method="POST">
+            <div class="contact-line line-draw" aria-hidden="true"></div>
+            <div class="glow glow-grow" aria-hidden="true" style="left: 50%; bottom: -320px; width: 1000px; height: 700px; margin-left: -500px; background: radial-gradient(closest-side, rgba(88, 80, 236, 0.26), rgba(0, 153, 215, 0.12) 55%, rgba(5, 8, 15, 0));"></div>
+            <div class="wrap">
+                <h2 class="reveal">Changeons la donne ensemble</h2>
+                <p class="reveal">Vous avez un défi en tête? Parlez-nous-en et lançons-nous.</p>
+                <form class="contact-form reveal-scale reveal-late" action="https://formspree.io/f/xgolevlg" method="POST">
                     <div class="form-row">
                         <div class="field">
                             <label for="name">Nom</label>
@@ -1106,7 +1126,7 @@
             const native = window.CSS && CSS.supports && CSS.supports('animation-timeline: view()');
             if (reduce || native) return;
 
-            const items = Array.from(document.querySelectorAll('.hero-copy, .hero-video, .reveal, .reveal-scale, .reveal-left, .reveal-right, .step, .parallax'));
+            const items = Array.from(document.querySelectorAll('.hero-copy, .hero-video, .reveal, .reveal-scale, .reveal-left, .reveal-right, .step, .parallax, .exit-fade, .glow-grow, .line-draw'));
             const hero = document.querySelector('.hero');
             const clamp = v => (v < 0 ? 0 : v > 1 ? 1 : v);
             let pending = false;
@@ -1126,12 +1146,31 @@
                         return;
                     }
                     const r = n.getBoundingClientRect();
+                    if (cl.contains('exit-fade')) {
+                        const x = clamp(-r.top / r.height);
+                        n.style.opacity = String(1 - 0.75 * x);
+                        n.style.transform = `scale(${1 - 0.04 * x})`;
+                        return;
+                    }
+                    if (cl.contains('glow-grow') || cl.contains('line-draw')) {
+                        const host = n.parentNode.getBoundingClientRect();
+                        if (cl.contains('line-draw')) {
+                            const g = clamp((vh - host.top) / (vh * 0.4));
+                            n.style.opacity = String(g);
+                            n.style.transform = `scaleX(${g})`;
+                        } else {
+                            const g = clamp((vh - host.top) / (vh * 0.9));
+                            n.style.opacity = String(0.2 + 0.8 * g);
+                            n.style.transform = `scale(${0.55 + 0.55 * g})`;
+                        }
+                        return;
+                    }
                     if (cl.contains('parallax')) {
                         const q = clamp((vh - r.top) / (vh + r.height));
                         n.style.transform = `translateY(${70 - 140 * q}px) scale(${0.95 + 0.05 * q})`;
                         return;
                     }
-                    const p = clamp((vh * 0.95 - r.top) / (vh * 0.35));
+                    const p = clamp((vh * (cl.contains('reveal-late') ? 0.9 : 0.95) - r.top) / (vh * 0.35));
                     if (cl.contains('reveal-scale')) {
                         n.style.opacity = String(0.15 + 0.85 * p);
                         n.style.transform = `translateY(${70 * (1 - p)}px) scale(${0.88 + 0.12 * p})`;
