@@ -360,6 +360,14 @@
 
         .about-main p { font-size: 21px; line-height: 1.55; color: var(--text-strong); }
 
+        .about-team { flex: 1 1 100%; min-width: 0; }
+
+        .about-team h3 { font-size: 15px; font-weight: 700; color: var(--sky-label); margin-bottom: 14px; }
+
+        .team { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+        .team h4 { font-size: 19px; margin-bottom: 8px; }
+
         .about-side { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
 
         .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
@@ -893,6 +901,14 @@
                         <h3>Ce qui nous distingue</h3>
                         <p>Une seule équipe, du début à la fin, tenue à deux normes : la rigueur du travail actuariel et la qualité d'outils bien conçus. Le résultat : des solutions fiables, conçues pour durer.</p>
                     </div>
+                </div>
+                <div class="about-team reveal">
+                    <h3>Notre équipe</h3>
+                    <ul class="team">
+                        <li class="card"><h4>Responsable actuariat</h4><p>Près d'une décennie en tarification, en provisionnement et en information financière.</p></li>
+                        <li class="card"><h4>Responsable analytique</h4><p>7 ans en prévisions, en conception d'indicateurs clés (KPI) et en production de rapports.</p></li>
+                        <li class="card"><h4>Responsable logiciel</h4><p>Diplôme en génie logiciel; plus de dix ans à concevoir des applications de données et des systèmes infonuagiques.</p></li>
+                    </ul>
                 </div>
             </div>
         </section>

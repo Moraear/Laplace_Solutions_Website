@@ -360,6 +360,14 @@
 
         .about-main p { font-size: 21px; line-height: 1.55; color: var(--text-strong); }
 
+        .about-team { flex: 1 1 100%; min-width: 0; }
+
+        .about-team h3 { font-size: 15px; font-weight: 700; color: var(--sky-label); margin-bottom: 14px; }
+
+        .team { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+
+        .team h4 { font-size: 19px; margin-bottom: 8px; }
+
         .about-side { flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
 
         .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
@@ -893,6 +901,14 @@
                         <h3>How We're Different</h3>
                         <p>One team, start to finish, held to two standards: the rigour of actuarial work and the quality of well-built tools. The result is solutions you can trust, built to last.</p>
                     </div>
+                </div>
+                <div class="about-team reveal">
+                    <h3>Our Team</h3>
+                    <ul class="team">
+                        <li class="card"><h4>Actuarial Lead</h4><p>Nearly a decade in pricing, reserving and financial reporting.</p></li>
+                        <li class="card"><h4>Analytics Lead</h4><p>7 years in forecasting, building KPIs and reporting.</p></li>
+                        <li class="card"><h4>Software Lead</h4><p>Software engineering degree; over a decade of building data applications and cloud systems.</p></li>
+                    </ul>
                 </div>
             </div>
         </section>
